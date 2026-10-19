@@ -11,9 +11,8 @@ $("h-acts").innerHTML = s.user
   : `<button class="btn gold" data-login>دخول الدارسين</button>`;
 $("vchip").innerHTML = `${esc(SITE.verse)}<small>${esc(SITE.verseRef)}</small>`;
 $("h-art").innerHTML = `
-  <div class="hero-graduation" aria-hidden="true">
-    <img src="images/graduation-first-batch.jpg" alt="صورة الدفعة الأولى - معهد في اتشوب">
-    <div class="hero-graduation-overlay"></div>
+  <div class="hero" aria-hidden="true">
+    <img src="images/graduation-first-batch.jpg" alt="صورة الدفعة الأولى - معهد في اتشوب" class="hero-img">
   </div>`;
 
 const get = (col, ...q) => getDocs(query(collection(db, col), ...q)).then((r) => r.docs.map((d) => ({ id: d.id, ...d.data() })));

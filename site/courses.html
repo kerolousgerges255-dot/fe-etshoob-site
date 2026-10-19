@@ -18,6 +18,16 @@
 <section class="banner"><div class="wrap"><h1>المحاضرات</h1><p>كل كورس وملفات محاضراته في مكان واحد.</p><label class="search" for="q"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.500-3.500"/></svg><input id="q" placeholder="دوّر على محاضرة أو محاضر"></label></div></section>
 <div class="wrap page-body" id="list"><p class="empty">جاري التحميل…</p></div>
 <dialog class="reader video" id="vdlg"><div class="reader-in"><button class="x" data-close aria-label="إغلاق">×</button><h2 id="vt"></h2><div class="vframe" id="vbox"></div></div></dialog>
+
+<dialog class="reader" id="rdlg"><div class="reader-in"><button class="x" data-close aria-label="إغلاق">×</button>
+  <div id="rcover" class="rcover"></div>
+  <h2 id="rtitle"></h2>
+  <p class="meta" id="rmeta"></p>
+  <div id="rbody" class="reading"></div>
+  <div class="row-end" style="margin-block-start:1.5rem;padding-block-start:1rem;border-block-start:1px solid var(--line)">
+    <a id="rpdf" class="btn gold" href="#" target="_blank" rel="noopener" hidden>تحميل PDF</a>
+  </div>
+</div></dialog>
 </main>
 <footer id="site-footer"></footer>
 <script type="module" src="js/courses.js"></script>
