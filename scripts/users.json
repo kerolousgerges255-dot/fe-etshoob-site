@@ -1,0 +1,5 @@
+[
+  { "name": "Nader",           "username": "nader",           "role": "admin" },
+  { "name": "Fr Gowargious",   "username": "fr.gowargious",   "role": "admin" },
+  { "name": "Abanoub Wagih",   "username": "abanoub.wagih",   "role": "student" }
+]

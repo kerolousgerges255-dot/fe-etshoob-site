@@ -1,0 +1,20 @@
+{
+  "name": "fe-etshoob-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "users": "node scripts/create-users.mjs",
+    "seed": "node scripts/seed-content.mjs",
+    "backup": "node scripts/backup.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "check": "node scripts/check.mjs",
+    "screenshots": "python scripts/record_demo.py",
+    "video": "python scripts/record_demo.py"
+  },
+  "dependencies": {
+    "firebase-admin": "^14.5.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

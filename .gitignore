@@ -1,0 +1,8 @@
+node_modules/
+serviceAccount.json
+credentials.csv
+backups/
+.env
+.env.*
+.firebase/
+tests/e2e/out/

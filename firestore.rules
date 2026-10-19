@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function profilePath() { return /databases/$(database)/documents/users/$(request.auth.uid); }
+    function isMember() { return signedIn() && exists(profilePath()) && get(profilePath()).data.active == true; }
+    function isAdmin()  { return isMember() && get(profilePath()).data.role == 'admin'; }
+
+    // الحسابات: كل واحد يقرأ حسابه بس، والإدارة بس تقرأ وتكتب للكل
+    match /users/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow write: if isAdmin();
+    }
+    // جلسة واحدة لكل حساب (بيكتبها الدارس لنفسه)
+    match /sessions/{uid} {
+      allow read, write: if isMember() && request.auth.uid == uid;
+    }
+    // كل المحتوى للدارسين المسجّلين والمفعّلين بس
+    match /announcements/{id} { allow read: if isMember(); allow write: if isAdmin(); }
+    match /meditations/{id}   { allow read: if isMember(); allow write: if isAdmin(); }  // لو عايز التأملات عامة: allow read: if true  + SITE.publicMeditations = true
+    match /courses/{id}       { allow read: if isMember(); allow write: if isAdmin(); }
+    match /lectures/{id}      { allow read: if isMember(); allow write: if isAdmin(); }
+    match /homework/{id}      { allow read: if isMember(); allow write: if isAdmin(); }
+
+    // أي حاجة تانية مقفولة
+    match /{document=**} { allow read, write: if false; }
+  }
+}
