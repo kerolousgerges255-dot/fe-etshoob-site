@@ -56,12 +56,10 @@ textarea{min-height:140px;resize:vertical}label{display:block;font-weight:700;ma
 .acts{display:flex;gap:.7rem;flex-wrap:wrap;justify-content:center}.hero .acts{margin-block-start:1.8rem}
 .hero .btn.ghost{color:#fff;border-color:rgba(255,255,255,.7)}.hero .btn.ghost:hover{background:rgba(255,255,255,.12)}
 .vchip{margin-block-start:2rem;padding-inline-start:1rem;border-inline-start:3px solid var(--gold);color:#fdebd8;max-width:30rem;font:400 1.25rem/1.9 "Amiri",serif}.vchip small{display:block;font:600 .85rem "Almarai",sans-serif;color:#e8d4c0}
-.hero{position:relative;overflow:hidden;color:#fff}
-.hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:0}
-.hero::before{content:"";position:absolute;inset:0;background:url("../images/posters/hero-pattern.svg") center/40px 40px;opacity:.6;pointer-events:none}
-.hero .hero-in{position:relative;z-index:1;max-width:1140px;margin-inline:auto;padding:clamp(3rem,7vw,5.5rem) 0 clamp(6rem,11vw,8.5rem)}
-.hero h1{text-wrap:balance;color:#fff;font-size:clamp(2.1rem,5vw,3.5rem);line-height:1.4;margin-block-end:1rem}
-.lead{font-size:1.18rem;color:#fdebd8;max-width:34rem;margin:0 auto}
+
+/* hero logo - left side with white circular background */
+.hero-logo{display:flex;align-items:center;justify-content:center}
+.hero-logo-img{height:120px;width:auto;background:#fff;border-radius:50%;padding:1rem;box-shadow:0 8px 24px rgba(0,0,0,.2);object-fit:contain}
 
 .hero.short{padding-block-end:3.5rem}
 /* stats */
