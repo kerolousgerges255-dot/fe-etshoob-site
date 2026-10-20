@@ -60,16 +60,16 @@ textarea{min-height:140px;resize:vertical}label{display:block;font-weight:700;ma
 .vchip{margin-block-start:2rem;padding-inline-start:1rem;border-inline-start:3px solid var(--gold);color:#fdebd8;max-width:30rem;font:400 1.25rem/1.9 "Amiri",serif}.vchip small{display:block;font:600 .85rem "Almarai",sans-serif;color:#e8d4c0}
 
 /* hero logo - left side with white circular background */
-.hero-logo{display:flex;align-items:center;justify-content:center}
-.hero-logo-img{height:144px;width:auto;background:#fff;border-radius:50%;padding:1rem;box-shadow:0 8px 24px rgba(0,0,0,.2);object-fit:contain}
+.hero-logo{display:flex;align-items:center;justify-content:center;overflow:hidden}
+.hero-logo-img{height:120px;width:auto;background:#fff;border-radius:50%;padding:0.8rem;box-shadow:0 8px 24px rgba(0,0,0,.2);object-fit:contain}
 
-/* desktop hero: two-column with logo on left, text on right */
+/* desktop hero: 25% logo right, 75% text left */
 @media (min-width: 769px) {
-  .hero-in{grid-template-columns:1fr 1.6fr;align-items:center;text-align:right;gap:2rem}
-  .hero-in-logo-wrap{order:2}
-  .hero-in-hero-text{order:1;text-align:right;align-items:flex-end}
-  .vchip{border-inline-start:none;border-inline-end:3px solid var(--gold);padding-inline-end:1rem;padding-inline-start:0;text-align:right}
-  .lead{margin:0 0 0 auto}
+  .hero-in{grid-template-columns:75% 25%;align-items:center;text-align:right;gap:1.5rem}
+  .hero-in-logo-wrap{display:flex;align-items:center;justify-content:flex-end}
+  .hero-in-hero-text{text-align:right;align-items:flex-end}
+  .vchip{border-inline-start:3px solid var(--gold);border-inline-end:none;padding-inline-start:1rem;padding-inline-end:0;text-align:right}
+  .lead{margin:0 auto}
   .acts{justify-content:flex-end}
 }
 

@@ -10,7 +10,7 @@ $("h-acts").innerHTML = s.user
   ? `<a class="btn gold" href="courses.html">ابدأ الآن</a><a class="btn ghost" href="meditations.html">اقرأ التأملات</a>`
   : `<button class="btn gold" data-login>دخول الدارسين</button>`;
 $("vchip").innerHTML = `${esc(SITE.verse)}<small>${esc(SITE.verseRef)}</small>`;
-$("h-art").innerHTML = `<div class="hero-logo" aria-hidden="true"><img src="images/logo.png" alt="شعار معهد في اتشوب" class="hero-logo-img"></div>`;
+$("h-art").innerHTML = `<div class="hero-in-logo-wrap"><div class="hero-logo" aria-hidden="true"><img src="images/logo.png" alt="شعار معهد في اتشوب" class="hero-logo-img"></div></div>`;
 
 const get = (col, ...q) => getDocs(query(collection(db, col), ...q)).then((r) => r.docs.map((d) => ({ id: d.id, ...d.data() })));
 
