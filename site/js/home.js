@@ -20,7 +20,7 @@ if (!s.user) {
   // Counters for guests: fixed values
   countUp($("s1"), 2);
   countUp($("s2"), 300);
-  countUp($("s3"), "3.9k");
+  countUp($("s3"), 3900);
   // Show courses for guests but inactive
   if (courses && courses.length) {
     $("courses-sec").hidden = false;
@@ -47,7 +47,7 @@ if (!s.user) {
 
   countUp($("s1"), courses ? courses.filter((c) => c.isParent).length : 0);
   countUp($("s2"), 300);
-  countUp($("s3"), "3.9k");
+  countUp($("s3"), 3900);
 
   const v = verseOfTheDay();
   $("votd").innerHTML = `<div class="votd"><span class="votd-l">آية اليوم</span><p>${esc(v.t)}</p><span class="meta">${esc(v.r)}</span></div>`;
