@@ -217,3 +217,22 @@ body.shield-off main,body.shield-off #site-header,body.shield-off #site-footer{v
 @media print{body *{display:none!important}body::after{content:"الطباعة غير مسموحة";display:block!important;font-size:2rem;text-align:center;padding:4rem}}
 .reader.video{width:min(980px,96vw)}.vframe{position:relative;aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden;margin-block-start:1rem}
 .vframe iframe{position:absolute;inset:0;width:100%;height:100%;border:0}.vframe .empty{color:#fff;position:absolute;inset:0;display:grid;place-items:center}
+
+/* Testimonials carousel */
+.testimonials-carousel{position:relative;max-width:800px;margin-inline:auto}
+.testimonials-track{overflow:hidden;border-radius:12px;position:relative}
+.testimonial-slide{position:absolute;inset:0;transition:transform .5s ease,opacity .5s ease;display:flex;flex-direction:column;justify-content:center;padding:2.5rem 2rem;background:var(--tint);border:1px solid var(--line);border-radius:12px}
+.testimonial-slide.active{position:relative;transform:translateX(0);opacity:1}
+.testimonial-slide:not(.active){opacity:0;pointer-events:none}
+.quote-mark{font-size:3.5rem;line-height:1;color:var(--gold);margin-block-end:-.5rem;font-family:serif}
+.testimonial-slide blockquote{margin:0 0 1.2rem;font-size:1.15rem;line-height:1.9;color:var(--text)}
+.testimonial-slide footer{text-align:start}
+.testimonial-slide footer strong{display:block;font-size:1rem;color:var(--blood)}
+.testimonial-slide footer .role{font-size:.85rem;color:var(--muted);margin-block-start:.2rem}
+.testimonials-nav{display:flex;justify-content:center;align-items:center;gap:.5rem;margin-block-start:1.2rem;flex-wrap:wrap}
+.carousel-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--line);background:#fff;color:var(--blood);cursor:pointer;display:grid;place-items:center;font-size:.85rem;transition:all .2s}
+.carousel-btn:hover{border-color:var(--blood);background:var(--blood);color:#fff}
+.testimonial-dot{width:10px;height:10px;border-radius:50%;border:1.5px solid var(--line);background:transparent;cursor:pointer;transition:all .2s ease;padding:0}
+.testimonial-dot:hover{border-color:var(--blood)}
+.testimonial-dot.active{background:var(--gold);border-color:var(--gold);transform:scale(1.1)}
+@media(prefers-reduced-motion:reduce){.testimonial-slide{transition:none;opacity:1;visibility:visible;transform:none}.testimonial-slide:not(.active){display:none}}
