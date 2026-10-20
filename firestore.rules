@@ -17,7 +17,7 @@ service cloud.firestore {
     }
     // كل المحتوى للدارسين المسجّلين والمفعّلين بس
     match /announcements/{id} { allow read: if isMember(); allow write: if isAdmin(); }
-    match /meditations/{id}   { allow read: if isMember(); allow write: if isAdmin(); }  // لو عايز التأملات عامة: allow read: if true  + SITE.publicMeditations = true
+    match /meditations/{id}   { allow read: if isMember(); allow write: if isAdmin(); }  // لو عايز التأملات عامة: سيب allow read بلا شرط + SITE.publicMeditations = true
     match /courses/{id}       { allow read: if isMember(); allow write: if isAdmin(); }
     match /lectures/{id}      { allow read: if isMember(); allow write: if isAdmin(); }
     match /homework/{id}      { allow read: if isMember(); allow write: if isAdmin(); }

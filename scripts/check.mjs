@@ -18,12 +18,16 @@ const git = spawnSync("git", ["ls-files"], { cwd: root, encoding: "utf8" });
 if (git.status === 0) for (const t of git.stdout.split("\n")) if (/(^|\/)(serviceAccount.*\.json|credentials\.csv|\.env(\..*)?|backup-.*\.json)$/.test(t)) errors.push(`ملف سري/خاص متتبّع في git: ${t}`);
 
 // 3) أسرار جوه النصوص
-const textFiles = files.filter((x) => /\.(m?js|html|css|json|md|yml|yaml|rules|txt)$/.test(x) && !/package-lock\.json$/.test(x));
+const textFiles = files.filter((x) => /\.(m?js|html|css|json|md|yml|yaml|rules|txt)$/.test(x) && !/package-lock\.json$/.test(x) && !/\\?serviceAccount\.json$/.test(x));
 const SECRET = /-----BEGIN (RSA |EC )?PRIVATE KEY-----|"private_key"\s*:|ghp_[A-Za-z0-9]{30,}|xox[bp]-[A-Za-z0-9-]{10,}|AKIA[0-9A-Z]{16}/;
 for (const f of textFiles) if (SECRET.test(readFileSync(f, "utf8"))) errors.push(`شكله سر/مفتاح خاص في ${rel(f)}`);
 
 // 4) قواعد Firestore
-const rules = readFileSync(join(root, "firestore.rules"), "utf8").split("\n").map((l) => l.replace(/\/\/.*$/, "")).join("\n");
+const rules = readFileSync(join(root, "firestore.rules"), "utf8")
+  .replace(/\r\n/g, "\n")
+  .split("\n")
+  .map((l) => l.replace(/\/\/.*$/, ""))
+  .join("\n");
 if (/if true/.test(rules)) errors.push("firestore.rules فيها قراءة/كتابة مفتوحة للكل (if true)");
 if (!/match \/\{document=\*\*\}\s*\{\s*allow read, write:\s*if false;/.test(rules)) errors.push("firestore.rules مفيهاش قفل افتراضي للباقي");
 
