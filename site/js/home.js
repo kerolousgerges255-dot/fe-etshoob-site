@@ -17,18 +17,10 @@ const get = (col, ...q) => getDocs(query(collection(db, col), ...q)).then((r) =>
 if (!s.user) {
   // الزائر: صفحة تعريفية بس، من غير أي محتوى
   $("hero").classList.add("short");
-  // Counters for guests: years (isParent) + lectures from term counts + meditations (if public)
-  const courses = await get("courses", orderBy("order")).catch(() => null);
-  const yearCount = courses ? courses.filter((c) => c.isParent).length : 0;
-  const lectureCount = courses ? courses.reduce((n, c) => n + (c.lectureCount || 0), 0) : 0;
-  countUp($("s1"), yearCount || "—");
-  countUp($("s2"), lectureCount || "—");
-  if (SITE.publicMeditations) {
-    const meds = await get("meditations", orderBy("createdAt", "desc")).catch(() => null);
-    countUp($("s3"), meds ? meds.length : "—");
-  } else {
-    countUp($("s3"), "—");
-  }
+  // Counters for guests: fixed values
+  countUp($("s1"), 2);
+  countUp($("s2"), 300);
+  countUp($("s3"), "3.9k");
   // Show courses for guests but inactive
   if (courses && courses.length) {
     $("courses-sec").hidden = false;
@@ -54,8 +46,8 @@ if (!s.user) {
   ]).then((r) => r.map((x) => (x.status === "fulfilled" ? x.value : null)));
 
   countUp($("s1"), courses ? courses.filter((c) => c.isParent).length : 0);
-  countUp($("s2"), courses ? courses.reduce((n, c) => n + (c.lectureCount || 0), 0) : 0);
-  countUp($("s3"), meds ? meds.length : 0);
+  countUp($("s2"), 300);
+  countUp($("s3"), "3.9k");
 
   const v = verseOfTheDay();
   $("votd").innerHTML = `<div class="votd"><span class="votd-l">آية اليوم</span><p>${esc(v.t)}</p><span class="meta">${esc(v.r)}</span></div>`;
