@@ -61,7 +61,7 @@ textarea{min-height:140px;resize:vertical}label{display:block;font-weight:700;ma
 
 /* hero logo - left side with white circular background */
 .hero-logo{display:flex;align-items:center;justify-content:center;overflow:hidden;opacity:0;transform:translateY(20px);animation:heroLogoAppear 0.8s ease-out 0.3s forwards}
-.hero-logo-img{height:144px;width:auto;background:#fff;border-radius:50%;padding:0.9rem;box-shadow:0 8px 24px rgba(0,0,0,.2);object-fit:contain;transition:transform 0.3s ease}
+.hero-logo-img{height:173px;width:auto;background:#fff;border-radius:50%;padding:1.1rem;box-shadow:0 8px 24px rgba(0,0,0,.2);object-fit:contain;transition:transform 0.3s ease}
 .hero-logo:hover .hero-logo-img{transform:scale(1.05)}
 
 @keyframes heroLogoAppear {
@@ -70,8 +70,8 @@ textarea{min-height:140px;resize:vertical}label{display:block;font-weight:700;ma
 
 /* desktop hero: 25% logo right, 75% text left */
 @media (min-width: 769px) {
-  .hero-in{grid-template-columns:75% 25%;align-items:center;text-align:right;gap:1.5rem}
-  .hero-in-logo-wrap{display:flex;align-items:flex-start;justify-content:flex-end;padding-block-start:0.5rem}
+  .hero-in{grid-template-columns:60% 40%;align-items:center;text-align:right;gap:1.5rem}
+  .hero-in-logo-wrap{display:flex;align-items:center;justify-content:flex-start;padding-block-start:0}
   .hero-in-hero-text{text-align:right;align-items:center}
   .vchip{border-inline-start:3px solid var(--gold);border-inline-end:none;padding-inline-start:1rem;padding-inline-end:0;text-align:right}
   .lead{margin:0 auto}
