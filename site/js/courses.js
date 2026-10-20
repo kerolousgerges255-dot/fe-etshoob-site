@@ -1,12 +1,14 @@
-import { session, renderChrome, requireLogin, auth, db, collection, getDocs, query, orderBy, esc, viewUrl, downloadUrl, SITE, safeUrl, renderText } from "./app.js";
+import { session, renderChrome, requireLogin, auth, db, collection, getDocs, query, orderBy, esc, downloadUrl, SITE, safeUrl, renderText } from "./app.js";
 const s = await session();
 renderChrome("courses", s);
+
 if (requireLogin(s)) {
   const list = document.getElementById("list"), q = document.getElementById("q");
   let courses = [], lectures = [], failed = false;
+
   try {
     courses = (await getDocs(query(collection(db, "courses"), orderBy("order")))).docs.map((d) => ({ id: d.id, ...d.data() }));
-    lectures = (await getDocs(query(collection(db, "lectures"), orderBy("order")))).docs.map((d) => ({ id: d.id, ...d.data() }));
+    lectures = (await getDocs(query(collection(db, "lectures"), orderBy("courseId", "semester", "order")))).docs.map((d) => ({ id: d.id, ...d.data() }));
   } catch { failed = true; list.innerHTML = `<p class="notice bad">تعذّر تحميل المحاضرات. حدّث الصفحة وجرّب تاني.</p>`; }
 
   const row = (l, n) => `<div class="lec"><span class="num">${n.toLocaleString("ar-EG")}</span>
@@ -17,16 +19,48 @@ if (requireLogin(s)) {
       ${l.videoId ? (SITE.video?.worker ? `<button class="btn ghost sm" data-play="${esc(l.videoId)}" data-title="${esc(l.title)}">شاهد الفيديو</button>` : `<span class="btn sm off" aria-disabled="true">الفيديو قريباً</span>`) : ""}
     </div></div>`;
 
+  // Group lectures by course and semester
+  const courseGroups = {};
+  for (const c of courses) {
+    courseGroups[c.id] = { ...c, semesters: {} };
+    for (const l of lectures.filter((l) => l.courseId === c.id)) {
+      if (!courseGroups[c.id].semesters[l.semester]) courseGroups[c.id].semesters[l.semester] = [];
+      courseGroups[c.id].semesters[l.semester].push(l);
+    }
+    // Sort semesters
+    for (const semester in courseGroups[c.id].semesters) {
+      courseGroups[c.id].semesters[semester].sort((a, b) => a.order - b.order);
+    }
+  }
+
   const draw = () => {
     if (failed) return;
     const t = q.value.trim().toLowerCase();
-    const html = courses.map((c) => {
-      const all = lectures.filter((l) => l.courseId === c.id);
-      const ls = all.filter((l) => !t || [l.title, l.description, l.instructor].join(" ").toLowerCase().includes(t));
-      return ls.length ? `<section class="course" id="${esc(c.id)}"><div class="course-h"><h2>${esc(c.title)}</h2>${c.description ? `<p>${esc(c.description)}</p>` : ""}</div>${ls.map((l) => row(l, all.indexOf(l) + 1)).join("")}</section>` : "";
-    }).join("");
+    let html = "";
+    for (const c of courses) {
+      const grp = courseGroups[c.id];
+      if (!grp) continue;
+      // Filter by search if needed
+      const hasMatch = !t || grp.semesters[1]?.some((l) => [l.title, l.description, l.instructor].join(" ").toLowerCase().includes(t)) ||
+                       grp.semesters[2]?.some((l) => [l.title, l.description, l.instructor].join(" ").toLowerCase().includes(t)) ||
+                       grp.semesters[3]?.some((l) => [l.title, l.description, l.instructor].join(" ").toLowerCase().includes(t));
+      if (!hasMatch && t) continue;
+
+      const semesterLabels = { 1: "الترم الأول", 2: "الترم الثاني", 3: "الترم الثالث" };
+      let semesterHtml = "";
+      for (const sem of [1, 2, 3]) {
+        const semLectures = grp.semesters[sem] || [];
+        if (!semLectures.length) continue;
+        const semClass = sem % 2 === 1 ? "odd" : "even";
+        semesterHtml += `<div class="semester"><h3>${semesterLabels[sem]}</h3><div class="lectures">${semLectures.map((l, n) => row(l, n + 1)).join("")}</div></div>`;
+      }
+      if (semesterHtml) {
+        html += `<section class="course" id="${esc(c.id)}"><div class="course-h"><h2>${esc(c.title)}</h2>${c.description ? `<p>${esc(c.description)}</p>` : ""}</div>${semesterHtml}</section>`;
+      }
+    }
     list.innerHTML = html || `<p class="empty">${t ? "مفيش محاضرة بالاسم ده." : "لسه مفيش محاضرات. هتظهر هنا أول ما الإدارة تضيفها."}</p>`;
   };
+
   q.addEventListener("input", draw); draw();
   if (location.hash) document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView();
 

@@ -16,10 +16,19 @@ const get = (col, ...q) => getDocs(query(collection(db, col), ...q)).then((r) =>
 
 if (!s.user) {
   // الزائر: صفحة تعريفية بس، من غير أي محتوى
-  $("hero").classList.add("short"); $("stats").hidden = true; $("courses-sec").hidden = true; $("hw").hidden = true;
-  $("feat").hidden = false;
-  const feats = [["المحاضرات", "ملفات كل محاضرة والفيديوهات بتفتح بعد تسجيل الدخول."], ["التأملات", "كلمات قصيرة بتنزل باستمرار للدارسين."], ["الواجب والإعلانات", "رابط الواجب والإعلانات المهمة في مكان واحد."]];
-  $("featgrid").innerHTML = feats.map(([t, d], i) => `<article class="card"><div class="media">${cover({}, i)}<span class="tag">للدارسين</span></div><div class="body"><h3>${t}</h3><p>${d}</p></div></article>`).join("");
+  $("hero").classList.add("short"); $("stats").hidden = true;
+  // Show courses for guests but inactive
+  const courses = await get("courses", orderBy("order")).catch(() => null);
+  if (courses && courses.length) {
+    $("courses-sec").hidden = false;
+    $("courses").innerHTML = courses.map((c, i) => `<article class="card"><div class="media">${cover(c, i)}</div><div class="body"><h3>${esc(c.title)}</h3><p>${esc(c.description || "")}</p><div class="row-end"><span class="pill">${(c.lectureCount || 0).toLocaleString("ar-EG")} محاضرة</span><span class="btn sm off" aria-disabled="true">متاح للدارسين</span></div></div></article>`).join("")
+  } else {
+    $("courses-sec").hidden = true;
+    $("feat").hidden = false;
+    const feats = [["المحاضرات", "ملفات كل محاضرة والفيديوهات بتفتح بعد تسجيل الدخول."], ["التأملات", "كلمات قصيرة بتنزل باستمرار للدارسين."], ["الواجب والإعلانات", "رابط الواجب والإعلانات المهمة في مكان واحد."]];
+    $("featgrid").innerHTML = feats.map(([t, d], i) => `<article class="card"><div class="media">${cover({}, i)}<span class="tag">للدارسين</span></div><div class="body"><h3>${t}</h3><p>${d}</p></div></article>`).join("");
+  }
+  $("hw").hidden = true;
   $("ann-sec").hidden = true;
   if (SITE.publicMeditations) {
     const meds = await get("meditations", orderBy("createdAt", "desc")).catch(() => null);
