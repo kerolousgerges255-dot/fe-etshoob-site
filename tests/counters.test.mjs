@@ -10,7 +10,7 @@ test("العداد: بيعرض ٢ كورس (سنين) لما يكون فيه ٢ 
   ];
   const yearCount = courses.filter((c) => c.isParent).length;
   const lectureCount = courses.reduce((n, c) => n + (c.lectureCount || 0), 0);
-  assert.equal(yearCount, 2, "العدد应有的 years = 2");
+  assert.equal(yearCount, 2, "عدد السنوات = 2");
   // سنة1 فيها ٣ + سنة2 فيها ٣ + ترم1 OT فيه ٣ + ترم1 NT فيه ٣ = ١٢
   assert.equal(lectureCount, 12, "إجمالي المحاضرات = 12");
 });
