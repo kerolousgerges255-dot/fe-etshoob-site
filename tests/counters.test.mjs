@@ -1,18 +1,17 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-test("العداد: بيعرض ٢ كورس (سنين) لما يكون فيه ٢ year + ٦ terms", () => {
+test("العداد: بيعرض ٢ كورس (سنين) و٣ محاضرات لما يكون فيه ٢ year + ٢ terms", () => {
   const courses = [
-    { id: "year1-ot", title: "السنة الأولى", isParent: true, lectureCount: 3 },
-    { id: "year2-nt", title: "السنة الثانية", isParent: true, lectureCount: 3 },
+    { id: "year1-ot", title: "السنة الأولى", isParent: true, lectureCount: 0 },
+    { id: "year2-nt", title: "السنة الثانية", isParent: true, lectureCount: 0 },
     { id: "ot-term1", title: "الترم الأول OT", lectureCount: 3, parentId: "year1-ot" },
-    { id: "nt-term1", title: "الترم الأول NT", lectureCount: 3, parentId: "year2-nt" }
+    { id: "nt-term1", title: "الترم الأول NT", lectureCount: 0, parentId: "year2-nt" }
   ];
   const yearCount = courses.filter((c) => c.isParent).length;
   const lectureCount = courses.reduce((n, c) => n + (c.lectureCount || 0), 0);
   assert.equal(yearCount, 2, "عدد السنوات = 2");
-  // سنة1 فيها ٣ + سنة2 فيها ٣ + ترم1 OT فيه ٣ + ترم1 NT فيه ٣ = ١٢
-  assert.equal(lectureCount, 12, "إجمالي المحاضرات = 12");
+  assert.equal(lectureCount, 3, "إجمالي المحاضرات = 3");
 });
 
 test("العداد: لو مفيش بيانات بيعرض — مش ٠", () => {
