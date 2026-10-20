@@ -81,16 +81,6 @@ const slides = testimonials.map((t) => {
 const nav = document.createElement("div");
 nav.className = "testimonials-nav";
 
-const prevBtn = document.createElement("button");
-prevBtn.className = "carousel-btn prev";
-prevBtn.setAttribute("aria-label", "السابق");
-prevBtn.textContent = "◀";
-
-const nextBtn = document.createElement("button");
-nextBtn.className = "carousel-btn next";
-nextBtn.setAttribute("aria-label", "التالي");
-nextBtn.textContent = "▶";
-
 const dots = testimonials.map((_, i) => {
   const dot = document.createElement("button");
   dot.className = "testimonial-dot" + (i === 0 ? " active" : "");
@@ -98,9 +88,6 @@ const dots = testimonials.map((_, i) => {
   nav.appendChild(dot);
   return dot;
 });
-
-nav.appendChild(prevBtn);
-nav.appendChild(nextBtn);
 
 const carousel = document.createElement("div");
 carousel.className = "testimonials-carousel";
@@ -153,6 +140,8 @@ function stopAutoSlide() {
   autoSlideInterval = null;
 }
 
+prevBtn.addEventListener("click", () => { prevSlide(); startAutoSlide(); });
+nextBtn.addEventListener("click", () => { nextSlide(); startAutoSlide(); });
 prevBtn.addEventListener("click", () => { prevSlide(); startAutoSlide(); });
 nextBtn.addEventListener("click", () => { nextSlide(); startAutoSlide(); });
 dots.forEach((dot, i) => dot.addEventListener("click", () => { showSlide(i); startAutoSlide(); }));

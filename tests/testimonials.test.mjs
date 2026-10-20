@@ -49,5 +49,5 @@ test("شهادة 6-2: ملف testimonials.js موجود وصياغته صحيح�
   assert.ok(js.includes("const CAROUSEL_INTERVAL = 15_000"), "الفاصل الزمني 15 ثانية مش موجود");
   assert.ok(js.includes("testimonials"), "مفيش متغير testimonials");
   assert.ok(js.includes("testimonial-slide"), "مفيش كلاس testimonial-slide");
-  assert.ok(js.includes("carousel-btn"), "مفيش كلاس carousel-btn");
+  assert.ok(js.includes("testimonial-dot"), "مفيش كلاس testimonial-dot");
 });

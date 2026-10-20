@@ -226,7 +226,7 @@ body.shield-off main,body.shield-off #site-header,body.shield-off #site-footer{v
 .testimonial-slide:not(.active){opacity:0;pointer-events:none}
 .quote-mark{font-size:3.5rem;line-height:1;color:var(--gold);margin-block-end:-.5rem;font-family:serif}
 .testimonial-slide blockquote{margin:0 0 1.2rem;font-size:1.15rem;line-height:1.9;color:var(--text)}
-.testimonial-slide footer{text-align:start}
+.testimonial-slide footer{text-align:center}
 .testimonial-slide footer strong{display:block;font-size:1rem;color:var(--blood)}
 .testimonial-slide footer .role{font-size:.85rem;color:var(--muted);margin-block-start:.2rem}
 .testimonials-nav{display:flex;justify-content:center;align-items:center;gap:.5rem;margin-block-start:1.2rem;flex-wrap:wrap}
