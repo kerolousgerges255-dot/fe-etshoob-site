@@ -68,9 +68,9 @@ textarea{min-height:140px;resize:vertical}label{display:block;font-weight:700;ma
   to { opacity:1; transform:translateY(0) }
 }
 
-/* desktop hero: 25% logo right, 75% text left */
+/* desktop hero: 75% text left, 25% logo right */
 @media (min-width: 769px) {
-  .hero-in{grid-template-columns:60% 40%;align-items:center;text-align:right;gap:1.5rem}
+  .hero-in{grid-template-columns:3fr 1fr;align-items:center;text-align:right;gap:1.5rem}
   .hero-in-logo-wrap{display:flex;align-items:center;justify-content:flex-start}
   .hero-in-hero-text{text-align:right;align-items:center}
   .vchip{border-inline-start:3px solid var(--gold);border-inline-end:none;padding-inline-start:1rem;padding-inline-end:0;text-align:right}
