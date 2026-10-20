@@ -12,7 +12,7 @@ const db = getFirestore(), now = FieldValue.serverTimestamp();
 // السنوات (isParent: true) — دي بتتحسب عشان العداد (العداد بيعرض عدد السنين بس)
 const years = [
   { id: "year1-ot", title: "السنة الأولى - العهد القديم", description: "بانوراما العهد القديم", cover: "images/covers/course-ot.jpg", order: 1, isParent: true },
-  { id: "year2-nt", title: "السنة الثانية - العهد الجديد", description: "بانوراما العهد الجديد", cover: "images/covers/course-nt.jpg", order: 2, isParent: true }
+  { id: "year2-nt", title: "السنة الثانية - العهد الجديد", description: "بانوراما العهد الجديد", cover: "images/covers/course-nt1.jpg", order: 2, isParent: true }
 ];
 
 // الترمات (بدون isParent) — كل ترم في سنه
@@ -22,9 +22,9 @@ const terms = [
   { id: "ot-term2", title: "العهد القديم - الترم الثاني", description: "أسفار موسى الخمسة والتاريخ", cover: "images/covers/course-ot.jpg", order: 2, parentId: "year1-ot" },
   { id: "ot-term3", title: "العهد القديم - الترم الثالث", description: "الأنبياء والحكمة", cover: "images/covers/course-ot.jpg", order: 3, parentId: "year1-ot" },
   // السنة الثانية - العهد الجديد
-  { id: "nt-term1", title: "العهد الجديد - الترم الأول", description: "البانوراما الإنجيلية", cover: "images/covers/course-nt.jpg", order: 4, parentId: "year2-nt" },
-  { id: "nt-term2", title: "العهد الجديد - الترم الثاني", description: "رسائل بولس والأعمال", cover: "images/covers/course-nt.jpg", order: 5, parentId: "year2-nt" },
-  { id: "nt-term3", title: "العهد الجديد - الترم الثالث", description: "الرسائل العامة والرؤيا", cover: "images/covers/course-nt.jpg", order: 6, parentId: "year2-nt" }
+  { id: "nt-term1", title: "العهد الجديد - الترم الأول", description: "البانوراما الإنجيلية", cover: "images/covers/course-nt1.jpg", order: 4, parentId: "year2-nt" },
+  { id: "nt-term2", title: "العهد الجديد - الترم الثاني", description: "رسائل بولس والأعمال", cover: "images/covers/course-nt1.jpg", order: 5, parentId: "year2-nt" },
+  { id: "nt-term3", title: "العهد الجديد - الترم الثالث", description: "الرسائل العامة والرؤيا", cover: "images/covers/course-nt1.jpg", order: 6, parentId: "year2-nt" }
 ];
 
 async function seedCourses() {
