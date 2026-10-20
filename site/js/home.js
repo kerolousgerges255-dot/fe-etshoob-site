@@ -16,9 +16,20 @@ const get = (col, ...q) => getDocs(query(collection(db, col), ...q)).then((r) =>
 
 if (!s.user) {
   // الزائر: صفحة تعريفية بس، من غير أي محتوى
-  $("hero").classList.add("short"); $("stats").hidden = true;
-  // Show courses for guests but inactive
+  $("hero").classList.add("short");
+  // Counters for guests: years (isParent) + lectures from term counts + meditations (if public)
   const courses = await get("courses", orderBy("order")).catch(() => null);
+  const yearCount = courses ? courses.filter((c) => c.isParent).length : 0;
+  const lectureCount = courses ? courses.reduce((n, c) => n + (c.lectureCount || 0), 0) : 0;
+  countUp($("s1"), yearCount || "—");
+  countUp($("s2"), lectureCount || "—");
+  if (SITE.publicMeditations) {
+    const meds = await get("meditations", orderBy("createdAt", "desc")).catch(() => null);
+    countUp($("s3"), meds ? meds.length : "—");
+  } else {
+    countUp($("s3"), "—");
+  }
+  // Show courses for guests but inactive
   if (courses && courses.length) {
     $("courses-sec").hidden = false;
     $("courses").innerHTML = courses.map((c, i) => `<article class="card"><div class="media">${cover(c, i)}</div><div class="body"><h3>${esc(c.title)}</h3><p>${esc(c.description || "")}</p><div class="row-end"><span class="pill">${(c.lectureCount || 0).toLocaleString("ar-EG")} محاضرة</span><span class="btn sm off" aria-disabled="true">متاح للدارسين</span></div></div></article>`).join("")
@@ -42,7 +53,7 @@ if (!s.user) {
     get("courses", orderBy("order"))
   ]).then((r) => r.map((x) => (x.status === "fulfilled" ? x.value : null)));
 
-  countUp($("s1"), courses ? courses.length : 0);
+  countUp($("s1"), courses ? courses.filter((c) => c.isParent).length : 0);
   countUp($("s2"), courses ? courses.reduce((n, c) => n + (c.lectureCount || 0), 0) : 0);
   countUp($("s3"), meds ? meds.length : 0);
 
