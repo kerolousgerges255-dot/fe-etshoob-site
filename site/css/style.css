@@ -70,12 +70,12 @@ textarea{min-height:140px;resize:vertical}label{display:block;font-weight:700;ma
 
 /* desktop hero: 75% text left, 25% logo right */
 @media (min-width: 769px) {
-  .hero-in{grid-template-columns:3fr 1fr;align-items:center;text-align:right;gap:2rem}
-  .hero-in-logo-wrap{display:flex;align-items:center;justify-content:center}
-  .hero-in-hero-text{text-align:right;align-items:center}
-  .vchip{border-inline-start:3px solid var(--gold);border-inline-end:none;padding-inline-start:1rem;padding-inline-end:0;text-align:right;margin-block-start:2.5rem}
+  .hero-in{grid-template-columns:1fr 1fr;align-items:center;text-align:center;gap:2rem}
+  .hero-in-logo-wrap{display:flex;align-items:center;justify-content:center;padding-block-start:0}
+  .hero-in-hero-text{text-align:center;align-items:center}
+  .vchip{border-inline-start:3px solid var(--gold);border-inline-end:none;padding-inline-start:1rem;padding-inline-end:0;text-align:center;margin-block-start:2rem}
   .lead{margin:0 auto}
-  .acts{justify-content:center;margin-block-start:2rem}
+  .acts{justify-content:center;margin-block-start:1.8rem}
 }
 
 .hero.short{padding-block-end:3.5rem}
