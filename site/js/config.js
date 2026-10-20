@@ -34,5 +34,5 @@ export const SECURITY = {
 // 4) الفيديو المحمي (Bunny Stream + Worker). سيبه فاضي لحد ما تجهّز الـ Worker (شوف docs/SECURITY.md)
 SITE.video = { worker: "" };           // مثال: "https://fe-etshoob-video.YOURNAME.workers.dev"
 
-// التأملات: false = للدارسين المسجّلين بس (الأأمن). true = مفتوحة للزوار
-SITE.publicMeditations = false;
+// التأملات: true = مفتوحة للزوار
+SITE.publicMeditations = true;
