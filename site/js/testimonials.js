@@ -140,10 +140,6 @@ function stopAutoSlide() {
   autoSlideInterval = null;
 }
 
-prevBtn.addEventListener("click", () => { prevSlide(); startAutoSlide(); });
-nextBtn.addEventListener("click", () => { nextSlide(); startAutoSlide(); });
-prevBtn.addEventListener("click", () => { prevSlide(); startAutoSlide(); });
-nextBtn.addEventListener("click", () => { nextSlide(); startAutoSlide(); });
 dots.forEach((dot, i) => dot.addEventListener("click", () => { showSlide(i); startAutoSlide(); }));
 
 // Swipe support
@@ -185,6 +181,7 @@ if (prefersReducedMotion.matches) {
   showSlide(0);
 } else {
   slides[0].style.opacity = "1";
+  slides[0].classList.add("active");
   startAutoSlide();
 }
 
