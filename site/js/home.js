@@ -23,9 +23,10 @@ if (!s.user) {
   countUp($("s3"), 3900);
   const v = verseOfTheDay();
   $("votd").innerHTML = `<div class="votd"><span class="votd-l">آية اليوم</span><p>${esc(v.t)}</p><span class="meta">${esc(v.r)}</span></div>`;
-  // Show courses for guests but inactive (years only, not terms)
-  const yearCourses = courses.filter((c) => c.isParent);
-  if (yearCourses && yearCourses.length) {
+  // Fetch courses and show years only for guests
+  const courses = await get("courses", orderBy("order")).catch(() => null);
+  const yearCourses = courses ? courses.filter((c) => c.isParent) : [];
+  if (yearCourses.length) {
     $("courses-sec").hidden = false;
     $("courses").innerHTML = yearCourses.map((c, i) => `<article class="card"><div class="media">${cover(c, i)}</div><div class="body"><h3>${esc(c.title)}</h3><p>${esc(c.description || "")}</p><div class="row-end"><span class="pill">${(c.lectureCount || 0).toLocaleString("ar-EG")} محاضرة</span><span class="btn sm off" aria-disabled="true">متاح للدارسين</span></div></div></article>`).join("")
   } else {
