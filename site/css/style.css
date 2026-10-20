@@ -57,11 +57,11 @@ textarea{min-height:140px;resize:vertical}label{display:block;font-weight:700;ma
 .lead{font-size:1.18rem;color:#fdebd8;max-width:34rem;margin:0 auto}
 .acts{display:flex;gap:.7rem;flex-wrap:wrap;justify-content:center}.hero .acts{margin-block-start:1.8rem}
 .hero .btn.ghost{color:#fff;border-color:rgba(255,255,255,.7)}.hero .btn.ghost:hover{background:rgba(255,255,255,.12)}
-.vchip{margin-block-start:2rem;padding-inline-start:1rem;border-inline-start:3px solid var(--gold);color:#fdebd8;max-width:30rem;font:400 2rem/1.9 "Amiri",serif}.vchip small{display:block;font:600 .85rem "Almarai",sans-serif;color:#e8d4c0}
+.vchip{margin-block-start:2rem;padding-inline-start:1rem;border-inline-start:3px solid var(--gold);color:#fdebd8;max-width:30rem;font:400 2.7rem/1.9 "Amiri",serif}.vchip small{display:block;font:600 .85rem "Almarai",sans-serif;color:#e8d4c0}
 
 /* hero logo - left side with white circular background */
 .hero-logo{display:flex;align-items:center;justify-content:center;overflow:hidden;opacity:0;transform:translateY(20px);animation:heroLogoAppear 0.8s ease-out 0.3s forwards}
-.hero-logo-img{height:234px;width:auto;background:#fff;border-radius:50%;padding:1.1rem;box-shadow:0 8px 24px rgba(0,0,0,.2);object-fit:contain;transition:transform 0.3s ease}
+.hero-logo-img{height:342px;width:auto;background:#fff;border-radius:50%;padding:1.1rem;box-shadow:0 8px 24px rgba(0,0,0,.2);object-fit:contain;transition:transform 0.3s ease}
 .hero-logo:hover .hero-logo-img{transform:scale(1.05)}
 
 @keyframes heroLogoAppear {
