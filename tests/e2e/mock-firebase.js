@@ -21,7 +21,7 @@ const store = {
 };
 export const initializeApp = () => ({}); export const deleteApp = () => {};
 export const getAuth = () => ({ currentUser: P.get("guest") ? null : { uid: "u1" } });
-export const onAuthStateChanged = (auth, cb) => { queueMicrotask(() => cb(P.get("guest") ? null : { uid: "u1" })); return () => {}; };
+export const onAuthStateChanged = (auth, cb) => { cb(P.get("guest") ? null : { uid: "u1" }); return () => {}; };
 export const signInWithEmailAndPassword = async () => ({ user: { uid: "u1" } });
 export const createUserWithEmailAndPassword = async () => ({ user: { uid: "new" } });
 export const signOut = async () => {};
