@@ -4,7 +4,10 @@ const ts = (d) => ({ toDate: () => new Date(d) });
 const P = new URLSearchParams(location.search);
 const store = {
   "users/u1": { name: "كيرلس جرجس", username: "kero.g", role: P.get("role") || "student", active: true },
-  announcements: [{ id: "a1", title: "بدء محاضرات الترم الأول", body: "المحاضرات كل يوم أحد الساعة السابعة مساءً.", pinned: true, createdAt: ts("2026-10-10") }],
+  announcements: [
+    { id: "a1", title: "بدء محاضرات الترم الأول", body: "المحاضرات كل يوم أحد الساعة السابعة مساءً.", pinned: true, createdAt: ts("2026-10-10") },
+    { id: "a2", title: "تسجيل الكورس الثاني مفتوح", body: "يمكنك الآن تسجيل الكورس الثاني عبر لوحة الإدارة.", pinned: false, createdAt: ts("2026-10-15") }
+  ],
   meditations: [
     { id: "m1", title: "النور الذي يضيء الطريق", author: "نادر", body: "## كلمتك سراج\n\nفي الصباح الباكر نبدأ يومنا بنور الكلمة.\n\n> سِرَاجٌ لِرِجْلِي كَلاَمُكَ وَنُورٌ لِسَبِيلِي.\n\nوالسراج لا يكشف الطريق كله دفعة واحدة.", createdAt: ts("2026-10-14"), cover: "images/covers/med-1.jpg" },
     { id: "m2", title: "ذوقوا وانظروا ما أطيب الرب", author: "نادر", body: "## حلاوة الكلمة\n\nالكلمة مش بس نقراها، لأ، بنعيشها.\n\n> ذُوقُوا وَانْظُرُوا مَا أَطْيَبَ الرَّبَّ!\n\nكل ما نقرب أكتر، بنلاقي حلاوة أكتر.", createdAt: ts("2026-10-15"), cover: "images/covers/med-2.jpg" },
