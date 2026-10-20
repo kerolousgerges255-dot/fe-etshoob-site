@@ -21,6 +21,8 @@ if (!s.user) {
   countUp($("s1"), 2);
   countUp($("s2"), 300);
   countUp($("s3"), 3900);
+  const v = verseOfTheDay();
+  $("votd").innerHTML = `<div class="votd"><span class="votd-l">آية اليوم</span><p>${esc(v.t)}</p><span class="meta">${esc(v.r)}</span></div>`;
   // Show courses for guests but inactive
   if (courses && courses.length) {
     $("courses-sec").hidden = false;
