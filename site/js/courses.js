@@ -1,4 +1,4 @@
-import { session, renderChrome, requireLogin, auth, db, collection, getDocs, query, orderBy, esc, downloadUrl, SITE, safeUrl, renderText } from "./app.js";
+import { session, renderChrome, requireLogin, auth, db, collection, getDocs, query, orderBy, esc, downloadUrl, SITE, safeUrl, renderText, cover } from "./app.js";
 const s = await session();
 renderChrome("courses", s);
 
@@ -8,61 +8,102 @@ if (requireLogin(s)) {
 
   try {
     courses = (await getDocs(query(collection(db, "courses"), orderBy("order")))).docs.map((d) => ({ id: d.id, ...d.data() }));
-    lectures = (await getDocs(query(collection(db, "lectures"), orderBy("courseId", "semester", "order")))).docs.map((d) => ({ id: d.id, ...d.data() }));
+    lectures = (await getDocs(query(collection(db, "lectures"), orderBy("courseId", "order")))).docs.map((d) => ({ id: d.id, ...d.data() }));
   } catch { failed = true; list.innerHTML = `<p class="notice bad">تعذّر تحميل المحاضرات. حدّث الصفحة وجرّب تاني.</p>`; }
+
+  // Group by year (isParent) and term (parentId)
+  const years = courses.filter((c) => c.isParent);
+  const terms = courses.filter((c) => !c.isParent);
 
   const row = (l, n) => `<div class="lec"><span class="num">${n.toLocaleString("ar-EG")}</span>
     <div><h3>${esc(l.title)}</h3><div class="chips">${l.instructor ? `<span class="chip2">${esc(l.instructor)}</span>` : ""}${l.lectureDate ? `<span class="chip2">${esc(l.lectureDate)}</span>` : ""}</div>${l.description ? `<p class="desc">${esc(l.description)}</p>` : ""}</div>
     <div class="acts">
       <button class="btn ghost sm" data-open-lecture="${esc(l.id)}" data-title="${esc(l.title)}">افتح المحاضرة</button>
       ${downloadUrl(l.pdfUrl || "") ? `<a class="btn sm" href="${esc(downloadUrl(l.pdfUrl))}" target="_blank" rel="noopener">تحميل PDF</a>` : `<span class="btn sm off" aria-disabled="true">الملف لسه ما اتضافش</span>`}
-      ${l.videoId ? (SITE.video?.worker ? `<button class="btn ghost sm" data-play="${esc(l.videoId)}" data-title="${esc(l.title)}">شاهد الفيديو</button>` : `<span class="btn sm off" aria-disabled="true">الفيديو قريباً</span>`) : ""}
+      ${l.videoId ? (SITE.video?.worker ? `<button class="btn ghost sm" data-play="${esc(l.videoId)}" data-title="${esc(l.title)}">شاهد الفيديو</button>` : `<span class="btn sm off" aria-disabled="true">الفيديو قريبااً</span>`) : ""}
     </div></div>`;
 
-  // Group lectures by course and semester
-  const courseGroups = {};
-  for (const c of courses) {
-    courseGroups[c.id] = { ...c, semesters: {} };
-    for (const l of lectures.filter((l) => l.courseId === c.id)) {
-      if (!courseGroups[c.id].semesters[l.semester]) courseGroups[c.id].semesters[l.semester] = [];
-      courseGroups[c.id].semesters[l.semester].push(l);
-    }
-    // Sort semesters
-    for (const semester in courseGroups[c.id].semesters) {
-      courseGroups[c.id].semesters[semester].sort((a, b) => a.order - b.order);
-    }
-  }
+  const termCard = (term, lectureCount) => {
+    const emptyHtml = lectureCount === 0 ? `<p class="empty" style="margin-top:0.5rem">لسه مفيش محاضرات</p>` : "";
+    return `<article class="card term-card" data-term="${esc(term.id)}">
+      <div class="media">${cover(term)}</div>
+      <div class="body">
+        <h3>${esc(term.title)}</h3>
+        <div class="row-end">
+          <span class="pill">${lectureCount.toLocaleString("ar-EG")} محاضرة</span>
+          <a class="btn sm" href="#term-${esc(term.id)}">افتح الترم</a>
+        </div>
+        ${emptyHtml}
+      </div>
+    </article>`;
+  };
 
+  const drawYears = () => {
+    if (failed) return;
+    let html = '<div class="year-grid">';
+    for (const year of years) {
+      const yearTerms = terms.filter((t) => t.parentId === year.id).sort((a, b) => a.order - b.order);
+      const termCards = yearTerms.map((t) => {
+        const lc = lectures.filter((l) => l.courseId === t.id).length;
+        return termCard(t, lc);
+      }).join("");
+      html += `<section class="year-section" id="${esc(year.id)}">
+        <div class="year-header">
+          <div class="media">${cover(year)}</div>
+          <div class="year-info"><h2>${esc(year.title)}</h2>${year.description ? `<p>${esc(year.description)}</p>` : ""}</div>
+        </div>
+        <div class="terms-grid">${termCards}</div>
+      </section>`;
+    }
+    html += '</div>';
+    list.innerHTML = html;
+  };
+
+  const drawTerm = (termId) => {
+    const term = terms.find((t) => t.id === termId);
+    if (!term) return drawYears();
+    const year = years.find((y) => y.id === term.parentId);
+    const termLectures = lectures.filter((l) => l.courseId === termId).sort((a, b) => a.order - b.order);
+    const backYear = year ? `<button class="btn ghost sm" data-back-year="${esc(year.id)}">رجوع للسنة</button>` : "";
+    const backAll = `<button class="btn ghost sm" data-back-all>كل الكورسات</button>`;
+    list.innerHTML = `
+      <div class="term-view">
+        <div class="term-header">
+          <div class="back-row">${backYear}${backAll}</div>
+          <div class="media">${cover(term)}</div>
+          <h2>${esc(term.title)}</h2>
+          ${term.description ? `<p>${esc(term.description)}</p>` : ""}
+        </div>
+        <div class="lectures-list">${termLectures.length ? termLectures.map((l, n) => row(l, n + 1)).join("") : '<p class="empty">لسه مفيش محاضرات للترم ده.</p>'}</div>
+      </div>`;
+  };
+
+  // Search: filter terms
   const draw = () => {
     if (failed) return;
     const t = q.value.trim().toLowerCase();
-    let html = "";
-    for (const c of courses) {
-      const grp = courseGroups[c.id];
-      if (!grp) continue;
-      // Filter by search if needed
-      const hasMatch = !t || grp.semesters[1]?.some((l) => [l.title, l.description, l.instructor].join(" ").toLowerCase().includes(t)) ||
-                       grp.semesters[2]?.some((l) => [l.title, l.description, l.instructor].join(" ").toLowerCase().includes(t)) ||
-                       grp.semesters[3]?.some((l) => [l.title, l.description, l.instructor].join(" ").toLowerCase().includes(t));
-      if (!hasMatch && t) continue;
-
-      const semesterLabels = { 1: "الترم الأول", 2: "الترم الثاني", 3: "الترم الثالث" };
-      let semesterHtml = "";
-      for (const sem of [1, 2, 3]) {
-        const semLectures = grp.semesters[sem] || [];
-        if (!semLectures.length) continue;
-        const semClass = sem % 2 === 1 ? "odd" : "even";
-        semesterHtml += `<div class="semester"><h3>${semesterLabels[sem]}</h3><div class="lectures">${semLectures.map((l, n) => row(l, n + 1)).join("")}</div></div>`;
-      }
-      if (semesterHtml) {
-        html += `<section class="course" id="${esc(c.id)}"><div class="course-h"><h2>${esc(c.title)}</h2>${c.description ? `<p>${esc(c.description)}</p>` : ""}</div>${semesterHtml}</section>`;
-      }
+    if (!t) return drawYears();
+    // Show years that have matching terms
+    let html = '<div class="year-grid">';
+    for (const year of years) {
+      const yearTerms = terms.filter((term) => {
+        if (term.parentId !== year.id) return false;
+        const yearLectures = lectures.filter((l) => l.courseId === term.id);
+        return yearLectures.some((l) => [l.title, l.description, l.instructor].join(" ").toLowerCase().includes(t));
+      });
+      if (!yearTerms.length) continue;
+      const termCards = yearTerms.map((term) => {
+        const lc = lectures.filter((l) => l.courseId === term.id).length;
+        return termCard(term, lc);
+      }).join("");
+      html += `<section class="year-section" id="${esc(year.id)}">
+        <div class="year-header"><div class="media">${cover(year)}</div><div class="year-info"><h2>${esc(year.title)}</h2></div></div>
+        <div class="terms-grid">${termCards}</div>
+      </section>`;
     }
-    list.innerHTML = html || `<p class="empty">${t ? "مفيش محاضرة بالاسم ده." : "لسه مفيش محاضرات. هتظهر هنا أول ما الإدارة تضيفها."}</p>`;
+    html += '</div>';
+    list.innerHTML = html;
   };
-
-  q.addEventListener("input", draw); draw();
-  if (location.hash) document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView();
 
   // Lecture Reader Modal
   const rd = document.getElementById("rdlg"), rbody = document.getElementById("rbody"), rtitle = document.getElementById("rtitle"), rmeta = document.getElementById("rmeta"), rcover = document.getElementById("rcover");
@@ -90,9 +131,15 @@ if (requireLogin(s)) {
   };
 
   list.addEventListener("click", async (e) => {
-    const openBtn = e.target.closest("[data-open-lecture]");
-    if (openBtn) {
-      openLecture(openBtn.dataset.openLecture, openBtn.dataset.title);
+    const termBtn = e.target.closest("[data-term]");
+    if (termBtn) { drawTerm(termBtn.dataset.term); return; }
+    const backYear = e.target.closest("[data-back-year]");
+    if (backYear) { location.hash = "#" + backYear.dataset.backYear; drawYears(); return; }
+    const backAll = e.target.closest("[data-back-all]");
+    if (backAll) { history.back(); drawYears(); return; }
+    const openLectureBtn = e.target.closest("[data-open-lecture]");
+    if (openLectureBtn) {
+      openLecture(openLectureBtn.dataset.openLecture, openLectureBtn.dataset.title);
       return;
     }
     const playBtn = e.target.closest("[data-play]");
@@ -111,4 +158,19 @@ if (requireLogin(s)) {
       } catch { vbox.innerHTML = `<p class="empty">تعذّر تشغيل الفيديو. حدّث الصفحة وجرّب تاني.</p>`; }
     }
   });
+
+  q.addEventListener("input", draw);
+  drawYears();
+
+  // Deep link handling
+  if (location.hash) {
+    const hash = decodeURIComponent(location.hash.slice(1));
+    if (hash.startsWith("term-")) {
+      drawTerm(hash.replace("term-", ""));
+    } else {
+      // Try as year ID
+      const el = document.getElementById(hash);
+      if (el) el.scrollIntoView();
+    }
+  }
 }

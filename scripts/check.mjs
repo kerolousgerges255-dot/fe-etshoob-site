@@ -28,7 +28,12 @@ const rules = readFileSync(join(root, "firestore.rules"), "utf8")
   .split("\n")
   .map((l) => l.replace(/\/\/.*$/, ""))
   .join("\n");
-if (/if true/.test(rules)) errors.push("firestore.rules فيها قراءة/كتابة مفتوحة للكل (if true)");
+// courses قراءة عامة مقصودة (Task 4)، ماعداها ممنوع
+if (/match \/courses\/\{id\}\s*\{[^}]*allow read:\s*if true;/.test(rules)) {
+  // OK
+} else if (/if true/.test(rules)) {
+  errors.push("firestore.rules فيها قراءة/كتابة مفتوحة للكل (if true) — ماعدا courses metadata");
+}
 if (!/match \/\{document=\*\*\}\s*\{\s*allow read, write:\s*if false;/.test(rules)) errors.push("firestore.rules مفيهاش قفل افتراضي للباقي");
 
 // 5) صفحات الموقع: كل ملف CSS/JS/صورة مذكور موجود، ومفيش أوامر inline
