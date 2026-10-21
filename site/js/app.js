@@ -26,7 +26,7 @@ const CROSS = `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M26 4H38L36 
 export const cover = (item, i = 0) => (safeUrl(item.cover) ? `<img src="${esc(safeUrl(item.cover))}" alt="" loading="lazy">` : `<span class="cv cv${i % 3}">${CROSS}</span>`);
 
 export function countUp(el, n) {
-  const fmt = (v) => v.toLocaleString("ar-EG");
+  const fmt = (v) => v.toLocaleString("ar-EG") + "+";
   if (!n || matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) { el.textContent = fmt(n || 0); return; }
   const io = new IntersectionObserver(([e]) => {
     if (!e.isIntersecting) return; io.disconnect();
