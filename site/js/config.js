@@ -9,7 +9,7 @@ export const firebaseConfig = {
 // 2) بيانات الموقع (غيّرها براحتك)
 export const SITE = {
   name: "في اتشوب",
-  institute: "معهد الكتاب المقدس — كاتدرائية الشهيد العظيم مار جرجس، العاشر من رمضان",
+ 
   heroTitle: "ادرس الكتاب المقدس في معهد في اتشوب",
   heroLead: "شوف المحاضرات، وحمّل ملف كل محاضرة، واقرأ التأملات، وتابع الإعلانات والواجب من مكان واحد.",
   verse: "سِرَاجٌ لِرِجْلِي كَلاَمُكَ وَنُورٌ لِسَبِيلِي.",
@@ -20,8 +20,9 @@ export const SITE = {
   links: {
     facebook: "https://www.facebook.com/profile.php?id=61560367155159",
     whatsapp: "https://wa.me/201555981300",
-    telegram: "https://t.me/+yDCMnC5Wujc3NGE0",
-    address: "كاتدرائية الشهيد العظيم مار جرجس - العاشر من رمضان - الشرقية"
+    // تليجرام الدارسين (مشفر Base64 عشان ميبقاش ظاهر في Source)
+    telegram: "aHR0cHM6Ly90Lm1lLyt5RENNbkM1V3VqYzNOR0Uw",
+    address: "معهد في اتشوب - كاتدرائية الشهيد العظيم مار جرجس - العاشر من رمضان - الشرقية"
   }
 };
 

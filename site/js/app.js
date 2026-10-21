@@ -86,7 +86,9 @@ export function renderChrome(active, s) {
     </div></div>`;
   const social = ["facebook"].filter((k) => L[k]).map((k) => `<a href="${esc(safeUrl(L[k]))}" target="_blank" rel="noopener" aria-label="${k}"><svg viewBox="0 0 24 24" fill="currentColor">${ICONS[k]}</svg></a>`);
   if (L.whatsapp) social.push(`<a href="${esc(safeUrl(L.whatsapp))}" target="_blank" rel="noopener" aria-label="whatsapp"><svg viewBox="0 0 24 24" fill="currentColor">${ICONS.whatsapp}</svg></a>`);
-  const telegramLink = s.user && L.telegram ? `<a href="${esc(safeUrl(L.telegram))}" target="_blank" rel="noopener" aria-label="telegram" style="color:var(--gold);text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;margin-block-start:.8rem"><svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;flex:none">${ICONS.telegram}</svg>تليجرام الدارسين</a>` : "";
+  // Decode base64 telegram link
+  const tgLink = s.user && L.telegram ? decodeURIComponent(escape(atob(L.telegram))) : "";
+  const telegramLink = tgLink ? `<a href="${esc(safeUrl(tgLink))}" target="_blank" rel="noopener" aria-label="telegram" style="color:var(--gold);text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;margin-block-start:.8rem"><svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;flex:none">${ICONS.telegram}</svg>جروب التليجرام للدارسين</a>` : "";
   document.getElementById("site-footer").innerHTML = `
     <div class="fband" aria-hidden="true"></div>
     <div class="wrap fgrid">
