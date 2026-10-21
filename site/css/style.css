@@ -263,7 +263,7 @@ html{scroll-behavior:smooth}
 
   /* Testimonials carousel */
   .testimonials-carousel{max-width:100%}
-  .testimonials-track{height:320px}
+  .testimonials-track{min-height:320px}
   .testimonial-slide{padding:1.5rem 1.2rem}
   .quote-mark{font-size:2.5rem}
 
@@ -310,7 +310,7 @@ html{scroll-behavior:smooth}
   .stat b{font-size:clamp(1.1rem,3vw,1.4rem)}
   .stat span{font-size:.72rem}
 
-  .testimonials-track{height:260px}
+  .testimonials-track{min-height:260px}
   .testimonial-slide{padding:1.2rem 1rem}
   .quote-mark{font-size:2rem}
 
@@ -335,7 +335,7 @@ html{scroll-behavior:smooth}
   .stats-in{padding:.9rem 0}
   .stat b{font-size:clamp(1.4rem,3.2vw,1.7rem)}
 
-  .testimonials-track{height:280px}
+  .testimonials-track{min-height:280px}
   .testimonial-slide{padding:1.4rem 1.1rem}
   .quote-mark{font-size:2.2rem}
 
@@ -361,7 +361,7 @@ html{scroll-behavior:smooth}
   .stats-in{padding:1rem 0}
   .stat b{font-size:clamp(1.5rem,3.5vw,1.9rem)}
 
-  .testimonials-track{height:290px}
+  .testimonials-track{min-height:290px}
   .testimonial-slide{padding:1.6rem 1.3rem}
   .quote-mark{font-size:2.4rem}
 
@@ -416,7 +416,7 @@ body.shield-off main,body.shield-off #site-header,body.shield-off #site-footer{v
 
 /* Testimonials carousel */
 .testimonials-carousel{position:relative;max-width:800px;margin-inline:auto}
-.testimonials-track{overflow:hidden;border-radius:12px;position:relative;height:280px}
+.testimonials-track{overflow:hidden;border-radius:12px;position:relative;min-height:280px}
 .testimonial-slide{position:absolute;inset:0;width:100%;height:100%;transition:transform .5s ease,opacity .5s ease;display:flex;flex-direction:column;justify-content:center;padding:2.5rem 2rem;background:var(--tint);border:1px solid var(--line);border-radius:12px}
 .testimonial-slide.active{position:relative;transform:translateX(0);opacity:1}
 .testimonial-slide:not(.active){opacity:0;pointer-events:none}
