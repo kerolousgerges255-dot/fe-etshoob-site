@@ -28,7 +28,7 @@ if (!s.user) {
   const yearCourses = courses ? courses.filter((c) => c.isParent) : [];
   if (yearCourses.length) {
     $("courses-sec").hidden = false;
-    $("courses").innerHTML = yearCourses.map((c, i) => `<article class="card"><div class="media">${cover(c, i)}</div><div class="body"><h3>${esc(c.title)}</h3><p>${esc(c.description || "")}</p><div class="row-end"><span class="pill">${(c.lectureCount || 0).toLocaleString("ar-EG")} محاضرة</span><span class="btn sm off" aria-disabled="true">متاح للدارسين</span></div></div></article>`).join("")
+    $("courses").innerHTML = yearCourses.map((c, i) => `<article class="card"><div class="media">${cover(c, i)}</div><div class="body"><h3>${esc(c.title)}</h3><p>${esc(c.description || "")}</p><div class="row-end"><span class="pill">${(c.lectureCount || 0).toLocaleString("ar-EG")} محاضرات</span><span class="btn sm off" aria-disabled="true">متاح للدارسين</span></div></div></article>`).join("")
   } else {
     $("courses-sec").hidden = true;
     $("feat").hidden = false;
@@ -62,8 +62,11 @@ if (!s.user) {
     $("hw").innerHTML = `<div class="hw-band${open ? "" : " shut"}"><div><span class="chip${open ? " on" : ""}">${open ? "مفتوح" : "مقفول"}</span><h3 style="display:inline">${esc(h?.title || "واجب المحاضرة")}</h3><p>${open ? "الواجب مفتوح دلوقتي، ادخل وابدأ." : "مفيش واجب مفتوح دلوقتي."}</p></div>${open ? `<a class="btn gold" href="${esc(safeUrl(h.url))}" target="_blank" rel="noopener">ابدأ الواجب</a>` : `<span class="btn off" aria-disabled="true">الواجب مقفول</span>`}</div>`;
   } catch { $("hw").innerHTML = `<p class="notice bad">تعذّر تحميل الواجب.</p>`; }
 
+  const yearCourses = courses ? courses.filter((c) => c.isParent) : [];
+  const termCourses = courses ? courses.filter((c) => !c.isParent) : [];
+  const calcYearLectures = (yearId) => termCourses.filter((t) => t.parentId === yearId).reduce((sum, t) => sum + (t.lectureCount || 0), 0);
   $("courses").innerHTML = !courses ? `<p class="notice bad">تعذّر تحميل الكورسات. حدّث الصفحة وجرّب تاني.</p>`
-    : courses.length ? courses.map((c, i) => `<article class="card"><div class="media">${cover(c, i)}</div><div class="body"><h3>${esc(c.title)}</h3><p>${esc(c.description || "")}</p><div class="row-end"><span class="pill">${(c.lectureCount || 0).toLocaleString("ar-EG")} محاضرة</span><a class="btn sm" href="courses.html#${esc(c.id)}">افتح الكورس</a></div></div></article>`).join("")
+    : yearCourses.length ? yearCourses.map((c, i) => `<article class="card"><div class="media">${cover(c, i)}</div><div class="body"><h3>${esc(c.title)}</h3><p>${esc(c.description || "")}</p><div class="row-end"><span class="pill">${calcYearLectures(c.id).toLocaleString("ar-EG")} محاضرات</span><a class="btn sm" href="courses.html#${esc(c.id)}">افتح الكورس</a></div></div></article>`).join("")
     : `<p class="empty">الكورسات هتظهر هنا أول ما الإدارة تضيفها.</p>`;
 
   if (ann && ann.length) {

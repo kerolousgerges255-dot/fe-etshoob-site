@@ -236,3 +236,16 @@ body.shield-off main,body.shield-off #site-header,body.shield-off #site-footer{v
 .testimonial-dot:hover{border-color:var(--blood)}
 .testimonial-dot.active{background:var(--gold);border-color:var(--gold);transform:scale(1.1)}
 @media(prefers-reduced-motion:reduce){.testimonial-slide{transition:none;opacity:1;visibility:visible;transform:none}.testimonial-slide:not(.active){display:none}}
+
+/* Terms as rows */
+.year-grid{display:grid;gap:2rem;margin-block-start:1rem}
+.year-section{background:#fff;border-radius:var(--r);box-shadow:var(--shadow);padding:1.2rem 1.4rem}
+.year-header{display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:center;margin-block-end:1rem;padding-block-end:1rem;border-block-end:1px solid var(--line)}
+.year-header .media img{height:31px;width:auto;border-radius:8px}
+.year-header h2{margin:0;font-size:1.3rem;color:var(--blood)}
+.year-header p{margin:.2rem 0 0;color:var(--muted);font-size:.9rem}
+.terms-grid{display:grid;gap:.6rem}
+.term-row{cursor:pointer}
+.term-row:hover{background:var(--tint)!important}
+.term-row .num{background:var(--blood);color:#fff}
+.term-row:hover .num{background:var(--blood-deep)}

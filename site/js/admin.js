@@ -14,7 +14,8 @@ const SECTIONS = {
     { k: "title", l: "عنوان التأمل", t: "text", req: 1 }, { k: "author", l: "الكاتب", t: "text" }, { k: "cover", l: "رابط صورة (اختياري)", t: "url" },
     { k: "body", l: "النص", t: "textarea", tall: 1, hint: "سطر فاضي = فقرة جديدة. ابدأ السطر بـ ‎## لعنوان فرعي، وبـ ‎> للآية أو الاقتباس." }] },
   courses: { label: "الكورسات", orderBy: ["order", "asc"], fields: [
-    { k: "title", l: "اسم الكورس", t: "text", req: 1 }, { k: "description", l: "وصف قصير", t: "text" }, { k: "cover", l: "رابط صورة الغلاف (اختياري)", t: "url" }, { k: "order", l: "الترتيب (رقم)", t: "number" }] },
+    { k: "title", l: "اسم الكورس", t: "text", req: 1 }, { k: "description", l: "وصف قصير", t: "text" }, { k: "cover", l: "رابط صورة الغلاف (اختياري)", t: "url" }, { k: "order", l: "الترتيب (رقم)", t: "number" },
+    { k: "isParent", l: "كورس رئيسي (يظهر في الصفحة الرئيسية)", t: "check" }, { k: "parentId", l: "الكورس الرئيسي", t: "parent", hint: "اختر السنة الرئيسية التي يتبعها هذا الترم" }] },
   lectures: { label: "المحاضرات", orderBy: ["order", "asc"], fields: [
     { k: "courseId", l: "الكورس", t: "course", req: 1 }, { k: "title", l: "عنوان المحاضرة", t: "text", req: 1 }, { k: "lectureNo", l: "رقم المحاضرة (مثال: المحاضرة الأولى)", t: "text" },
     { k: "instructor", l: "المحاضر (مثال: القس إسحق عطية)", t: "text" }, { k: "lectureDate", l: "تاريخ المحاضرة (اختياري)", t: "text" }, { k: "description", l: "وصف قصير", t: "text" },
@@ -36,12 +37,13 @@ const fieldHtml = (f, d, opts) => {
   if (f.t === "check") return `<label class="chk"><input type="checkbox" id="${id}" ${v ? "checked" : ""}>${f.l}</label>`;
   if (f.t === "textarea") return `<label for="${id}">${f.l}</label><textarea id="${id}" ${f.tall ? 'style="min-height:300px"' : ""}>${esc(v)}</textarea>${h}`;
   if (f.t === "course") return `<label for="${id}">${f.l}</label><select id="${id}">${opts.map((o) => `<option value="${esc(o.id)}" ${o.id === v ? "selected" : ""}>${esc(o.title)}</option>`).join("")}</select>`;
+  if (f.t === "parent") return `<label for="${id}">${f.l}</label><select id="${id}"><option value="">— لا —</option>${opts.filter(o=>o.isParent).map((o) => `<option value="${esc(o.id)}" ${o.id === v ? "selected" : ""}>${esc(o.title)}</option>`).join("")}</select>`;
   return `<label for="${id}">${f.l}</label><input id="${id}" type="${f.t === "number" ? "number" : f.t === "url" ? "url" : "text"}" value="${esc(v)}" ${f.t === "url" ? 'dir="ltr"' : ""}>${h}`;
 };
 
 async function crud(box, key) {
   const cfg = SECTIONS[key];
-  const courses = cfg.fields.some((f) => f.t === "course") ? (await getDocs(query(collection(db, "courses"), orderBy("order")))).docs.map((d) => ({ id: d.id, ...d.data() })) : [];
+  const courses = cfg.fields.some((f) => f.t === "course" || f.t === "parent") ? (await getDocs(query(collection(db, "courses"), orderBy("order")))).docs.map((d) => ({ id: d.id, ...d.data() })) : [];
   if (key === "lectures" && !courses.length) { box.innerHTML = `<p class="notice">ضيف كورس الأول من تبويب "الكورسات".</p>`; return; }
   let editing = null;
   box.innerHTML = `<div class="panel"><h2 id="ft"></h2><div id="form"></div><p><button class="btn" id="save">حفظ</button> <button class="btn alt" id="cancel" hidden>إلغاء التعديل</button></p></div><div class="panel"><h2>${cfg.label} الحالية</h2><div id="items"></div></div>`;
@@ -53,6 +55,10 @@ async function crud(box, key) {
   }
   $("save").onclick = async () => {
     const v = {}; for (const f of cfg.fields) { v[f.k] = val(f); if (f.req && !v[f.k]) return toast(`املا خانة: ${f.l}`, true); if (f.t === "url" && v[f.k] && !safeUrl(v[f.k])) return toast(`الرابط في "${f.l}" لازم يبدأ بـ https://`, true); }
+    if (key === "courses") {
+      if (!v.isParent && !v.parentId) return toast("لو ده كورس فرعي، لازم تختار الكورس الرئيسي", true);
+      if (v.isParent) v.parentId = "";
+    }
     try {
       const bump = (cid, n) => updateDoc(doc(db, "courses", cid), { lectureCount: increment(n) });
       if (editing) {

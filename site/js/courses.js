@@ -8,7 +8,7 @@ if (requireLogin(s)) {
 
   try {
     courses = (await getDocs(query(collection(db, "courses"), orderBy("order")))).docs.map((d) => ({ id: d.id, ...d.data() }));
-    lectures = (await getDocs(query(collection(db, "lectures"), orderBy("courseId", "order")))).docs.map((d) => ({ id: d.id, ...d.data() }));
+    lectures = (await getDocs(query(collection(db, "lectures"), orderBy("courseId")))).docs.map((d) => ({ id: d.id, ...d.data() }));
   } catch { failed = true; list.innerHTML = `<p class="notice bad">تعذّر تحميل المحاضرات. حدّث الصفحة وجرّب تاني.</p>`; }
 
   // Group by year (isParent) and term (parentId)
@@ -23,6 +23,13 @@ if (requireLogin(s)) {
       ${l.videoId ? (SITE.video?.worker ? `<button class="btn ghost sm" data-play="${esc(l.videoId)}" data-title="${esc(l.title)}">شاهد الفيديو</button>` : `<span class="btn sm off" aria-disabled="true">الفيديو قريبااً</span>`) : ""}
     </div></div>`;
 
+  const termRow = (t, n, lc) => `<div class="lec term-row" data-term="${esc(t.id)}"><span class="num">${n.toLocaleString("ar-EG")}</span>
+    <div><h3>${esc(t.title)}</h3>${t.description ? `<p class="desc">${esc(t.description)}</p>` : ""}</div>
+    <div class="acts">
+      <span class="pill">${lc.toLocaleString("ar-EG")} محاضرات</span>
+      <a class="btn sm" href="#term-${esc(t.id)}">افتح</a>
+    </div></div>`;
+
   const termCard = (term, lectureCount) => {
     const emptyHtml = lectureCount === 0 ? `<p class="empty" style="margin-top:0.5rem">لسه مفيش محاضرات</p>` : "";
     return `<article class="card term-card" data-term="${esc(term.id)}">
@@ -30,7 +37,7 @@ if (requireLogin(s)) {
       <div class="body">
         <h3>${esc(term.title)}</h3>
         <div class="row-end">
-          <span class="pill">${lectureCount.toLocaleString("ar-EG")} محاضرة</span>
+          <span class="pill">${lectureCount.toLocaleString("ar-EG")} محاضرات</span>
           <a class="btn sm" href="#term-${esc(term.id)}">افتح الترم</a>
         </div>
         ${emptyHtml}
@@ -43,9 +50,9 @@ if (requireLogin(s)) {
     let html = '<div class="year-grid">';
     for (const year of years) {
       const yearTerms = terms.filter((t) => t.parentId === year.id).sort((a, b) => a.order - b.order);
-      const termCards = yearTerms.map((t) => {
+      const termCards = yearTerms.map((t, i) => {
         const lc = lectures.filter((l) => l.courseId === t.id).length;
-        return termCard(t, lc);
+        return termRow(t, i + 1, lc);
       }).join("");
       html += `<section class="year-section" id="${esc(year.id)}">
         <div class="year-header">
@@ -70,7 +77,6 @@ if (requireLogin(s)) {
       <div class="term-view">
         <div class="term-header">
           <div class="back-row">${backYear}${backAll}</div>
-          <div class="media">${cover(term)}</div>
           <h2>${esc(term.title)}</h2>
           ${term.description ? `<p>${esc(term.description)}</p>` : ""}
         </div>
