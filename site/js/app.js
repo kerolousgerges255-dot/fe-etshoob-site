@@ -90,7 +90,7 @@ export function renderChrome(active, s) {
     <div class="wrap fgrid">
       <div><span class="plate"><img src="images/logo.png" alt=""></span><p>${esc(SITE.tagline || SITE.heroLead)}</p>${social.length ? `<div class="social">${social.join("")}</div>` : ""}</div>
       <div><h4>روابط سريعة</h4><ul>${links.map(([, h, l]) => `<li><a href="${h}">${l}</a></li>`).join("")}</ul></div>
-      <div><h4>المعهد</h4><span class="plate"><img src="images/cathedral.png" alt=""></span><p>${esc(SITE.institute)}</p>${L.address ? `<p>${esc(L.address)}</p>` : ""}${L.whatsapp ? `<p><a href="${esc(safeUrl(L.whatsapp))}" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;display:inline-flex;align-items:center;gap:.4rem"><svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;flex:none">${ICONS.whatsapp}</svg>محادثة واتساب مباشرة</a></p>` : ""}</div>
+      <div><h4>المعهد</h4><span class="plate"><img src="images/cathedral.png" alt=""></span><p>${esc(SITE.institute)}</p>${L.address ? `<p>${esc(L.address)}</p>` : ""}</div>
     </div>
     <div class="copy">© ${new Date().getFullYear()} ${esc(SITE.name)} — معهد الكتاب المقدس</div>`;
   document.getElementById("logout")?.addEventListener("click", async () => { await signOut(auth); location.href = "index.html"; });
