@@ -19,8 +19,8 @@ if (!s.user) {
   $("hero").classList.add("short");
   // Counters for guests: fixed values
   countUp($("s1"), 2);
-  countUp($("s2"), 300);
-  countUp($("s3"), 3900);
+  countUp($("s2"), 300, "+");
+  countUp($("s3"), 3900, "+");
   const v = verseOfTheDay();
   $("votd").innerHTML = `<div class="votd"><span class="votd-l">آية اليوم</span><p>${esc(v.t)}</p><span class="meta">${esc(v.r)}</span></div>`;
 
@@ -58,8 +58,8 @@ if (!s.user) {
   ]).then((r) => r.map((x) => (x.status === "fulfilled" ? x.value : null)));
 
   countUp($("s1"), courses ? courses.filter((c) => c.isParent).length : 0);
-  countUp($("s2"), 300);
-  countUp($("s3"), 3900);
+  countUp($("s2"), 300, "+");
+  countUp($("s3"), 3900, "+");
 
   const v = verseOfTheDay();
   $("votd").innerHTML = `<div class="votd"><span class="votd-l">آية اليوم</span><p>${esc(v.t)}</p><span class="meta">${esc(v.r)}</span></div>`;
