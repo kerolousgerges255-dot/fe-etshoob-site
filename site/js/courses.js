@@ -18,7 +18,6 @@ if (requireLogin(s)) {
   const row = (l, n) => `<div class="lec"><span class="num">${n.toLocaleString("ar-EG")}</span>
     <div><h3>${esc(l.title)}</h3><div class="chips">${l.instructor ? `<span class="chip2">${esc(l.instructor)}</span>` : ""}${l.lectureDate ? `<span class="chip2">${esc(l.lectureDate)}</span>` : ""}</div>${l.description ? `<p class="desc">${esc(l.description)}</p>` : ""}</div>
     <div class="acts">
-      <button class="btn ghost sm" data-open-lecture="${esc(l.id)}" data-title="${esc(l.title)}">افتح المحاضرة</button>
       ${downloadUrl(l.pdfUrl || "") ? `<a class="btn sm" href="${esc(downloadUrl(l.pdfUrl))}" target="_blank" rel="noopener">تحميل PDF</a>` : `<span class="btn sm off" aria-disabled="true">الملف لسه ما اتضافش</span>`}
       ${l.videoId ? (SITE.video?.worker ? `<button class="btn ghost sm" data-play="${esc(l.videoId)}" data-title="${esc(l.title)}">شاهد الفيديو</button>` : `<span class="btn sm off" aria-disabled="true">الفيديو قريبااً</span>`) : ""}
     </div></div>`;
