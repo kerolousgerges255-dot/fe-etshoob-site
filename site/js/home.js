@@ -23,8 +23,15 @@ if (!s.user) {
   countUp($("s3"), 3900);
   const v = verseOfTheDay();
   $("votd").innerHTML = `<div class="votd"><span class="votd-l">آية اليوم</span><p>${esc(v.t)}</p><span class="meta">${esc(v.r)}</span></div>`;
-  // Fetch courses and show years only for guests
-  const courses = await get("courses", orderBy("order")).catch(() => null);
+
+  // Fetch courses and meditations in PARALLEL for guests (faster load)
+  const [coursesResult, medsResult] = await Promise.allSettled([
+    get("courses", orderBy("order")),
+    SITE.publicMeditations ? get("meditations", orderBy("createdAt", "desc")) : Promise.resolve(null)
+  ]);
+  const courses = coursesResult.status === "fulfilled" ? coursesResult.value : null;
+  const meds = medsResult.status === "fulfilled" ? medsResult.value : null;
+
   const yearCourses = courses ? courses.filter((c) => c.isParent) : [];
   if (yearCourses.length) {
     $("courses-sec").hidden = false;
@@ -38,7 +45,6 @@ if (!s.user) {
   $("hw").hidden = true;
   $("ann-sec").hidden = true;
   if (SITE.publicMeditations) {
-    const meds = await get("meditations", orderBy("createdAt", "desc")).catch(() => null);
     $("meds").innerHTML = meds && meds.length ? meds.slice(0, 3).map((m, i) => `<article class="card"><div class="media">${cover(m, i + 1)}</div><div class="body"><span class="meta">${esc([m.author, fmtDate(m.createdAt)].filter(Boolean).join("، "))}</span><h3>${esc(m.title)}</h3><p>${esc(excerpt(m.body))}</p><div class="row-end"><a class="btn ghost sm" href="meditations.html#${esc(m.id)}">اقرأ التأمل</a></div></div></article>`).join("") : `<p class="empty">لسه مفيش تأملات.</p>`;
   } else $("meds-sec").hidden = true;
   $("cta").innerHTML = `<div class="cta"><h2>جاهز تبدأ؟</h2><p>سجّل دخولك بالحساب اللي اتسلّمتلك.</p><button class="btn" data-login>دخول الدارسين</button></div>`;
