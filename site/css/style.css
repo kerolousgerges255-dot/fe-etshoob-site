@@ -418,11 +418,14 @@ body.shield-off main,body.shield-off #site-header,body.shield-off #site-footer{v
 .testimonials-carousel{position:relative;max-width:800px;margin-inline:auto}
 .testimonials-track{overflow:hidden;border-radius:12px;position:relative;min-height:280px}
 @media (max-width: 480px){
-  .testimonials-track{overflow:hidden;height:auto;min-height:unset}
-  .testimonial-slide{position:absolute!important;inset:0!important;width:100%!important;height:auto!important;min-height:320px!important;margin:0!important;transform:none!important;opacity:1!important;visibility:visible!important;display:flex!important;align-items:center!important;padding:1.2rem 1rem!important}
+  .testimonials-track{overflow:hidden;height:auto;min-height:340px}
+  .testimonial-slide{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-height:340px!important;margin:0!important;transform:none!important;opacity:1!important;visibility:visible!important;display:flex!important;align-items:center!important;padding:1rem!important}
+  .testimonial-slide.active{position:relative!important;height:auto!important;min-height:340px!important}
   .testimonial-slide:not(.active){transform:translateX(100%)!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
-  .quote-mark{font-size:2rem!important}
-  .testimonial-slide blockquote{font-size:1rem!important;line-height:1.7!important;margin-bottom:.8rem!important}
+  .quote-mark{font-size:1.8rem!important}
+  .testimonial-slide blockquote{font-size:.95rem!important;line-height:1.6!important;margin-bottom:.6rem!important}
+  .testimonial-slide footer strong{font-size:.9rem!important}
+  .testimonial-slide footer .role{font-size:.8rem!important}
 }
 .testimonial-slide{position:absolute;inset:0;width:100%;height:100%;transition:transform .5s ease,opacity .5s ease;display:flex;flex-direction:column;justify-content:center;padding:2.5rem 2rem;background:var(--tint);border:1px solid var(--line);border-radius:12px}
 .testimonial-slide.active{position:relative;transform:translateX(0);opacity:1}
