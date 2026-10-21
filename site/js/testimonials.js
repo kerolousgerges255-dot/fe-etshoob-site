@@ -108,6 +108,7 @@ container.appendChild(carousel);
 let currentIndex = 0;
 let autoSlideInterval = null;
 let isTransitioning = false;
+const isMobile = () => window.matchMedia("(max-width: 480px)").matches;
 
 function showSlide(index) {
   if (isTransitioning) return;
@@ -115,16 +116,30 @@ function showSlide(index) {
 
   slides.forEach((s, i) => {
     s.classList.remove("active");
-    s.style.transform = `translateX(${(i - index) * 100}%)`;
-    s.style.opacity = i === index ? "1" : "0";
+    if (isMobile()) {
+      // على الموبايل: الشريحة النشطة تكون relative والباقي مخفي
+      s.style.position = i === index ? "relative" : "absolute";
+      s.style.opacity = i === index ? "1" : "0";
+      s.style.visibility = i === index ? "visible" : "hidden";
+    } else {
+      s.style.transform = `translateX(${(i - index) * 100}%)`;
+      s.style.opacity = i === index ? "1" : "0";
+      s.style.visibility = "";
+    }
   });
 
   dots.forEach((d, i) => d.classList.toggle("active", i === index));
   currentIndex = index;
 
   setTimeout(() => {
-    slides[index].style.transform = "translateX(0)";
-    slides[index].style.opacity = "1";
+    if (isMobile()) {
+      slides[index].style.position = "relative";
+      slides[index].style.opacity = "1";
+      slides[index].style.visibility = "visible";
+    } else {
+      slides[index].style.transform = "translateX(0)";
+      slides[index].style.opacity = "1";
+    }
     isTransitioning = false;
   }, 50);
 }
