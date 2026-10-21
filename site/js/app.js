@@ -75,7 +75,7 @@ const loginHtml = (tag = "h2") => `<img src="images/logo.png" alt=""><${tag}>أ�
 
 export function renderChrome(active, s) {
   const L = SITE.links || {};
-  const links = [["home", "index.html", "الرئيسية"], ["courses", "courses.html", "المحاضرات"], ["med", "meditations.html", "التأملات"]];
+  const links = [["home", "index.html", "الرئيسية"], ["courses", "courses.html", "المحاضرات"], ["med", "meditations.html", "التأملات"], ["about", "about.html", "من نحن"]];
   if (s.profile?.role === "admin") links.push(["admin", "admin.html", "الإدارة"]);
   document.getElementById("site-header").innerHTML = `
     <div class="annbar" id="annbar" hidden></div>
