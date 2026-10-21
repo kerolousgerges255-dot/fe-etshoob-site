@@ -59,7 +59,41 @@ if (!s.user) {
   try {
     const h = (await getDoc(doc(db, "homework", "current"))).data();
     const open = !!(h && h.active && safeUrl(h.url));
-    $("hw").innerHTML = `<div class="hw-band${open ? "" : " shut"}"><div><span class="chip${open ? " on" : ""}">${open ? "مفتوح" : "مقفول"}</span><h3 style="display:inline">${esc(h?.title || "واجب المحاضرة")}</h3><p>${open ? "الواجب مفتوح دلوقتي، ادخل وابدأ." : "مفيش واجب مفتوح دلوقتي."}</p></div>${open ? `<a class="btn gold" href="${esc(safeUrl(h.url))}" target="_blank" rel="noopener">ابدأ الواجب</a>` : `<span class="btn off" aria-disabled="true">الواجب مقفول</span>`}</div>`;
+    const dl = h?.deadline ? new Date(h.deadline).getTime() : null;
+    const updateCountdown = () => {
+      if (!dl) return { html: "", active: false };
+      const now = Date.now();
+      const diff = dl - now;
+      if (diff <= 0) return { html: `<span class="chip off">انتهى</span>`, active: false };
+      const days = Math.floor(diff / 86400000);
+      const hours = Math.floor((diff % 86400000) / 3600000);
+      const mins = Math.floor((diff % 3600000) / 60000);
+      const s = [];
+      if (days) s.push(`${days.toLocaleString("ar-EG")} يوم`);
+      if (hours) s.push(`${hours.toLocaleString("ar-EG")} ساعة`);
+      if (mins || !s.length) s.push(`${mins.toLocaleString("ar-EG")} دقيقة`);
+      return { html: `<span class="chip deadline">باقي ${s.join(" و")}</span>`, active: true };
+    };
+    const countdown = updateCountdown();
+    const isAlive = open && (!dl || dl > Date.now());
+    const badge = countdown.html || (open ? `<span class="chip on">مفتوح</span>` : `<span class="chip off">مقفول</span>`);
+    $("hw").innerHTML = `<div class="hw-band${isAlive ? "" : " shut"}"><div class="hw-info"><h3>${esc(h?.title || "واجب المحاضرة")}</h3><p>${isAlive ? "الواجب مفتوح دلوقتي، ادخل وابدأ." : "مفيش واجب مفتوح دلوقتي."}</p></div><div class="hw-actions">${isAlive ? `<a class="btn gold" href="${esc(safeUrl(h.url))}" target="_blank" rel="noopener">ابدأ الواجب</a>` : `<span class="btn off" aria-disabled="true">الواجب مقفول</span>`}${countdown.active ? `<span class="chip deadline">${countdown.html}</span>` : ""}</div></div>`;
+    // تحديث العداد كل ثانية لو فيه deadline
+    let hwTimer = null;
+    if (dl && countdown.active) {
+      hwTimer = setInterval(() => {
+        const c = updateCountdown();
+        const badge = document.querySelector(".hw-band .chip");
+        if (badge) badge.outerHTML = c.html;
+        if (!c.active) {
+          const band = document.querySelector(".hw-band");
+          if (band) band.classList.add("shut");
+          const link = document.querySelector(".hw-band a.btn.gold");
+          if (link) link.outerHTML = `<span class="btn off" aria-disabled="true">الواجب مقفول</span>`;
+          clearInterval(hwTimer);
+        }
+      }, 1000);
+    }
   } catch { $("hw").innerHTML = `<p class="notice bad">تعذّر تحميل الواجب.</p>`; }
 
   const yearCourses = courses ? courses.filter((c) => c.isParent) : [];

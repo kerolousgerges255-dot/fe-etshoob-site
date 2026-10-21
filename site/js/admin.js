@@ -83,14 +83,23 @@ async function crud(box, key) {
 async function homework(box) {
   const ref = doc(db, "homework", "current"), d = (await getDoc(ref)).data() || {};
   const status = (x) => (x.active && x.url ? "الواجب مفتوح ✔" : "الواجب مقفول");
+  const dlVal = d.deadline ? new Date(d.deadline).toISOString().slice(0,16) : "";
   box.innerHTML = `<div class="panel"><h2>رابط الواجب</h2><p class="notice" id="st">${status(d)}</p>
     <label for="t">عنوان الواجب</label><input id="t" value="${esc(d.title || "")}" placeholder="مثال: واجب المحاضرة الخامسة">
     <label for="u">رابط Google Form</label><input id="u" dir="ltr" type="url" value="${esc(d.url || "")}">
     <label class="chk"><input type="checkbox" id="a" ${d.active ? "checked" : ""}>الواجب مفتوح (يظهر الزرار للدارسين)</label>
+    <label for="dl">ميعاد انتهاء الواجب (اختياري)</label>
+    <input id="dl" type="datetime-local" value="${esc(dlVal)}" dir="ltr">
+    <p class="meta">لو حطت مياعيد، هيبقى فيه عداد يرجع للدارسين. لو مفيش، هيتقفل يدويًا بس.</p>
     <p><button class="btn" id="save">حفظ</button> <button class="btn alt" id="close">قفل الواجب</button> <button class="btn danger" id="clear">مسح الرابط</button></p>
     <p class="meta">لما تقفل الفورم في جوجل، اضغط "قفل الواجب" علشان الزرار يبقى Not Active عند الدارسين.</p></div>`;
   const put = async (v, m) => { try { await setDoc(ref, { ...v, updatedAt: serverTimestamp() }, { merge: true }); $("st").textContent = status(v.url !== undefined ? v : { ...v, url: $("u").value }); toast(m); } catch { toast("فشل الحفظ", true); } };
-  $("save").onclick = () => { const u = $("u").value.trim(); if (u && !safeUrl(u)) return toast("الرابط لازم يبدأ بـ https://", true); put({ title: $("t").value.trim(), url: u, active: $("a").checked }, "اتحفظ"); };
+  $("save").onclick = () => {
+    const u = $("u").value.trim();
+    if (u && !safeUrl(u)) return toast("الرابط لازم يبدأ بـ https://", true);
+    const dl = $("dl").value ? new Date($("dl").value).toISOString() : "";
+    put({ title: $("t").value.trim(), url: u, active: $("a").checked, deadline: dl }, "اتحفظ");
+  };
   $("close").onclick = () => { $("a").checked = false; put({ active: false }, "الواجب اتقفل"); };
   $("clear").onclick = () => { $("u").value = ""; $("a").checked = false; put({ url: "", active: false }, "الرابط اتمسح"); };
 }
