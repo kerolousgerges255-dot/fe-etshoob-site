@@ -1,6 +1,6 @@
 // 1) Firebase Console > Project settings > Your apps > Web app > انسخ القيم هنا
 export const firebaseConfig = {
-  apiKey: "AIzaSyDjZXOrjh_KI8VnfBM9cO1Wmtbc7k-Vf3s",
+  apiKey: "AIzaSyAN0nswaL47_MqeM-jKtwYKalHQRaQlMlw",
   authDomain: "feetshoub.firebaseapp.com",
   projectId: "feetshoub",
   appId: "1:490074731207:web:ca990a0c9ab617bbbec4e2"
