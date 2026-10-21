@@ -20,6 +20,7 @@ export const SITE = {
   links: {
     facebook: "https://www.facebook.com/profile.php?id=61560367155159",
     whatsapp: "https://wa.me/201555981300",
+    telegram: "https://t.me/+yDCMnC5Wujc3NGE0",
     address: "كاتدرائية الشهيد العظيم مار جرجس - العاشر من رمضان - الشرقية"
   }
 };

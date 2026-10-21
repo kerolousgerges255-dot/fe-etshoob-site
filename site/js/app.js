@@ -68,7 +68,8 @@ export async function login(username, password) {
 
 const ICONS = {
   facebook: '<path d="M13 22v-8h3l.5-3.5H13V8.3c0-1 .3-1.7 1.8-1.7h1.9V3.4c-.3 0-1.4-.2-2.6-.2-2.6 0-4.4 1.6-4.4 4.5v2.8h-3V14h3v8z"/>',
-  whatsapp: '<path d="M12 2a10 10 0 0 0-8.600 15.100L2 22l5-1.300A10 10 0 1 0 12 2zm5.200 14.100c-.2.600-1.300 1.200-1.800 1.200-.5.100-1 .2-3.300-.7-2.800-1.100-4.600-4-4.700-4.200-.1-.2-1.100-1.500-1.100-2.800s.7-2 .9-2.300c.2-.3.500-.3.700-.3h.5c.2 0 .4 0 .6.500l.8 2c.1.200.1.300 0 .5l-.3.400-.4.500c-.1.100-.3.300-.1.600.2.300.8 1.300 1.700 2.100 1.200 1 2.100 1.300 2.400 1.500.3.100.5.100.6-.1l.9-1.100c.2-.3.400-.2.700-.1l1.900.9c.3.100.5.200.5.300.1.200.1.800-.1 1.400z"/>'
+  whatsapp: '<path d="M12 2a10 10 0 0 0-8.600 15.100L2 22l5-1.300A10 10 0 1 0 12 2zm5.200 14.100c-.2.600-1.300 1.200-1.800 1.200-.5.100-1 .2-3.300-.7-2.800-1.100-4.600-4-4.700-4.200-.1-.2-1.100-1.500-1.100-2.800s.7-2 .9-2.300c.2-.3.500-.3.700-.3h.5c.2 0 .4 0 .6.500l.8 2c.1.200.1.300 0 .5l-.3.400-.4.500c-.1.100-.3.300-.1.600.2.300.8 1.300 1.700 2.100 1.200 1 2.100 1.300 2.400 1.500.3.100.5.100.6-.1l.9-1.100c.2-.3.400-.2.700-.1l1.900.9c.3.100.5.200.5.300.1.200.1.800-.1 1.400z"/>',
+  telegram: '<path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 11.944 0zM4.957 7.397c.226-3.453 3.047-3.76 5.04-4.725 2.204-1.095 3.307-1.16 4.044-.178.737.983.64 2.783.357 4.643-.29 1.888-1.41 4.748-2.162 6.338-.947 2.067-1.65 2.727-2.357 2.767-.707.04-1.07-.453-1.82-.947l-2.5-1.577zm2.2-1.577c.57 1.45 1.52 3.64 2.24 5.07.77 1.5 1.57 2.3 2.14 2.24.56-.06 1.34-.72 1.94-2.2.6-1.47 1.5-4.05 1.7-5.4.2-1.35-.17-2.17-.74-2.27-.57-.1-1.44.27-2.28.87-.84.6-1.82 1.53-2.17 2.17-.34.64-.44 1.08-.83 2.02z"/>'
 };
 const loginHtml = (tag = "h2") => `<img src="images/logo.png" alt=""><${tag}>أهلاً بك مرة أخرى!</${tag}><p class="meta">اكتب اسم المستخدم وكلمة المرور اللي اتسلّمتلك.</p><div data-msg role="alert"></div><label>اسم المستخدم</label><input data-u autocomplete="username" dir="ltr" autocapitalize="none" spellcheck="false"><label>كلمة المرور</label><input data-p type="password" autocomplete="current-password" dir="ltr"><button class="btn block" data-go>تسجيل الدخول</button>`;
 
@@ -85,10 +86,11 @@ export function renderChrome(active, s) {
     </div></div>`;
   const social = ["facebook"].filter((k) => L[k]).map((k) => `<a href="${esc(safeUrl(L[k]))}" target="_blank" rel="noopener" aria-label="${k}"><svg viewBox="0 0 24 24" fill="currentColor">${ICONS[k]}</svg></a>`);
   if (L.whatsapp) social.push(`<a href="${esc(safeUrl(L.whatsapp))}" target="_blank" rel="noopener" aria-label="whatsapp"><svg viewBox="0 0 24 24" fill="currentColor">${ICONS.whatsapp}</svg></a>`);
+  const telegramLink = s.user && L.telegram ? `<a href="${esc(safeUrl(L.telegram))}" target="_blank" rel="noopener" aria-label="telegram" style="color:var(--gold);text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;margin-block-start:.8rem"><svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;flex:none">${ICONS.telegram}</svg>تليجرام الدارسين</a>` : "";
   document.getElementById("site-footer").innerHTML = `
     <div class="fband" aria-hidden="true"></div>
     <div class="wrap fgrid">
-      <div><span class="plate"><img src="images/logo.png" alt=""></span><p>${esc(SITE.tagline || SITE.heroLead)}</p>${social.length ? `<div class="social">${social.join("")}</div>` : ""}</div>
+      <div><span class="plate"><img src="images/logo.png" alt=""></span><p>${esc(SITE.tagline || SITE.heroLead)}</p>${social.length ? `<div class="social">${social.join("")}</div>` : ""}${telegramLink}</div>
       <div><h4>روابط سريعة</h4><ul>${links.map(([, h, l]) => `<li><a href="${h}">${l}</a></li>`).join("")}</ul></div>
       <div><h4>المعهد</h4><span class="plate"><img src="images/cathedral.png" alt=""></span><p>${esc(SITE.institute)}</p>${L.address ? `<p>${esc(L.address)}</p>` : ""}</div>
     </div>
