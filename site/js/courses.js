@@ -83,31 +83,17 @@ if (requireLogin(s)) {
       </div>`;
   };
 
-  // Search: filter terms
+  // Search: filter lectures (not terms) — show individual matching lectures
   const draw = () => {
     if (failed) return;
     const t = q.value.trim().toLowerCase();
     if (!t) return drawYears();
-    // Show years that have matching terms
-    let html = '<div class="year-grid">';
-    for (const year of years) {
-      const yearTerms = terms.filter((term) => {
-        if (term.parentId !== year.id) return false;
-        const yearLectures = lectures.filter((l) => l.courseId === term.id);
-        return yearLectures.some((l) => [l.title, l.description, l.instructor].join(" ").toLowerCase().includes(t));
-      });
-      if (!yearTerms.length) continue;
-      const termCards = yearTerms.map((term) => {
-        const lc = lectures.filter((l) => l.courseId === term.id).length;
-        return termCard(term, lc);
-      }).join("");
-      html += `<section class="year-section" id="${esc(year.id)}">
-        <div class="year-header"><div class="media">${cover(year)}</div><div class="year-info"><h2>${esc(year.title)}</h2></div></div>
-        <div class="terms-grid">${termCards}</div>
-      </section>`;
+    const matchedLectures = lectures.filter((l) => [l.title, l.description, l.instructor].join(" ").toLowerCase().includes(t)).sort((a, b) => a.order - b.order);
+    if (!matchedLectures.length) {
+      list.innerHTML = `<p class="empty">مفيش محاضرات توافق البحث ده.</p>`;
+      return;
     }
-    html += '</div>';
-    list.innerHTML = html;
+    list.innerHTML = `<div class="lectures-list">${matchedLectures.map((l, n) => row(l, n + 1)).join("")}</div>`;
   };
 
   // Lecture Reader Modal
