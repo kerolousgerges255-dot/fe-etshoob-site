@@ -10,20 +10,32 @@ $("h-acts").innerHTML = s.user
   ? `<a class="btn gold" href="courses.html">ابدأ الآن</a><a class="btn ghost" href="meditations.html">اقرأ التأملات</a>`
   : `<button class="btn gold" data-login>دخول الدارسين</button>`;
 $("vchip").innerHTML = `${esc(SITE.verse)}<small>${esc(SITE.verseRef)}</small>`;
-$("h-art").innerHTML = `
-  <div class="hero-graduation" aria-hidden="true">
-    <img src="images/graduation-first-batch.jpg" alt="صورة الدفعة الأولى - معهد في اتشوب">
-    <div class="hero-graduation-overlay"></div>
-  </div>`;
+$("h-art").innerHTML = `<div class="hero-in-logo-wrap"><div class="hero-logo" aria-hidden="true"><img src="images/logo.png" alt="شعار معهد في اتشوب" class="hero-logo-img"></div></div>`;
 
 const get = (col, ...q) => getDocs(query(collection(db, col), ...q)).then((r) => r.docs.map((d) => ({ id: d.id, ...d.data() })));
 
 if (!s.user) {
   // الزائر: صفحة تعريفية بس، من غير أي محتوى
-  $("hero").classList.add("short"); $("stats").hidden = true; $("courses-sec").hidden = true; $("hw").hidden = true;
-  $("feat").hidden = false;
-  const feats = [["المحاضرات", "ملفات كل محاضرة والفيديوهات بتفتح بعد تسجيل الدخول."], ["التأملات", "كلمات قصيرة بتنزل باستمرار للدارسين."], ["الواجب والإعلانات", "رابط الواجب والإعلانات المهمة في مكان واحد."]];
-  $("featgrid").innerHTML = feats.map(([t, d], i) => `<article class="card"><div class="media">${cover({}, i)}<span class="tag">للدارسين</span></div><div class="body"><h3>${t}</h3><p>${d}</p></div></article>`).join("");
+  $("hero").classList.add("short");
+  // Counters for guests: fixed values
+  countUp($("s1"), 2);
+  countUp($("s2"), 300);
+  countUp($("s3"), 3900);
+  const v = verseOfTheDay();
+  $("votd").innerHTML = `<div class="votd"><span class="votd-l">آية اليوم</span><p>${esc(v.t)}</p><span class="meta">${esc(v.r)}</span></div>`;
+  // Fetch courses and show years only for guests
+  const courses = await get("courses", orderBy("order")).catch(() => null);
+  const yearCourses = courses ? courses.filter((c) => c.isParent) : [];
+  if (yearCourses.length) {
+    $("courses-sec").hidden = false;
+    $("courses").innerHTML = yearCourses.map((c, i) => `<article class="card"><div class="media">${cover(c, i)}</div><div class="body"><h3>${esc(c.title)}</h3><p>${esc(c.description || "")}</p><div class="row-end"><span class="pill">${(c.lectureCount || 0).toLocaleString("ar-EG")} محاضرات</span><span class="btn sm off" aria-disabled="true">متاح للدارسين</span></div></div></article>`).join("")
+  } else {
+    $("courses-sec").hidden = true;
+    $("feat").hidden = false;
+    const feats = [["المحاضرات", "ملفات كل محاضرة والفيديوهات بتفتح بعد تسجيل الدخول."], ["التأملات", "كلمات قصيرة بتنزل باستمرار للدارسين."], ["الواجب والإعلانات", "رابط الواجب والإعلانات المهمة في مكان واحد."]];
+    $("featgrid").innerHTML = feats.map(([t, d], i) => `<article class="card"><div class="media">${cover({}, i)}<span class="tag">للدارسين</span></div><div class="body"><h3>${t}</h3><p>${d}</p></div></article>`).join("");
+  }
+  $("hw").hidden = true;
   $("ann-sec").hidden = true;
   if (SITE.publicMeditations) {
     const meds = await get("meditations", orderBy("createdAt", "desc")).catch(() => null);
@@ -37,9 +49,9 @@ if (!s.user) {
     get("courses", orderBy("order"))
   ]).then((r) => r.map((x) => (x.status === "fulfilled" ? x.value : null)));
 
-  countUp($("s1"), courses ? courses.length : 0);
-  countUp($("s2"), courses ? courses.reduce((n, c) => n + (c.lectureCount || 0), 0) : 0);
-  countUp($("s3"), meds ? meds.length : 0);
+  countUp($("s1"), courses ? courses.filter((c) => c.isParent).length : 0);
+  countUp($("s2"), 300);
+  countUp($("s3"), 3900);
 
   const v = verseOfTheDay();
   $("votd").innerHTML = `<div class="votd"><span class="votd-l">آية اليوم</span><p>${esc(v.t)}</p><span class="meta">${esc(v.r)}</span></div>`;
@@ -47,11 +59,50 @@ if (!s.user) {
   try {
     const h = (await getDoc(doc(db, "homework", "current"))).data();
     const open = !!(h && h.active && safeUrl(h.url));
-    $("hw").innerHTML = `<div class="hw-band${open ? "" : " shut"}"><div><span class="chip${open ? " on" : ""}">${open ? "مفتوح" : "مقفول"}</span><h3 style="display:inline">${esc(h?.title || "واجب المحاضرة")}</h3><p>${open ? "الواجب مفتوح دلوقتي، ادخل وابدأ." : "مفيش واجب مفتوح دلوقتي."}</p></div>${open ? `<a class="btn gold" href="${esc(safeUrl(h.url))}" target="_blank" rel="noopener">ابدأ الواجب</a>` : `<span class="btn off" aria-disabled="true">الواجب مقفول</span>`}</div>`;
+    const dl = h?.deadline ? new Date(h.deadline).getTime() : null;
+    const updateCountdown = () => {
+      if (!dl) return { html: "", active: false };
+      const now = Date.now();
+      const diff = dl - now;
+      if (diff <= 0) return { html: `<span class="chip off">انتهى</span>`, active: false };
+      const days = Math.floor(diff / 86400000);
+      const hours = Math.floor((diff % 86400000) / 3600000);
+      const mins = Math.floor((diff % 3600000) / 60000);
+      const secs = Math.floor((diff % 60000) / 1000);
+      const s = [];
+      if (days) s.push(`${days.toLocaleString("ar-EG")} يوم`);
+      if (hours) s.push(`${hours.toLocaleString("ar-EG")} ساعة`);
+      if (mins || !s.length) s.push(`${mins.toLocaleString("ar-EG")} دقيقة`);
+      if (secs > 0 || !s.length) s.push(`${secs.toLocaleString("ar-EG")} ثانية`);
+      return { html: `<span class="chip deadline">باقي ${s.join(" و")}</span>`, active: true };
+    };
+    const countdown = updateCountdown();
+    const isAlive = open && (!dl || dl > Date.now());
+    const badge = countdown.html || (open ? `<span class="chip on">مفتوح</span>` : `<span class="chip off">مقفول</span>`);
+    $("hw").innerHTML = `<div class="hw-band${isAlive ? "" : " shut"}"><div class="hw-info"><h3>${esc(h?.title || "واجب المحاضرة")}</h3><p>${isAlive ? "الواجب مفتوح دلوقتي، ادخل وابدأ." : "مفيش واجب مفتوح دلوقتي."}</p></div><div class="hw-actions">${countdown.active ? `<span class="chip deadline">${countdown.html}</span>` : ""}${isAlive ? `<a class="btn gold" href="${esc(safeUrl(h.url))}" target="_blank" rel="noopener">ابدأ الواجب</a>` : `<span class="btn off" aria-disabled="true">الواجب مقفول</span>`}</div></div>`;
+    // تحديث العداد كل ثانية لو فيه deadline
+    let hwTimer = null;
+    if (dl && countdown.active) {
+      hwTimer = setInterval(() => {
+        const c = updateCountdown();
+        const badge = document.querySelector(".hw-band .chip");
+        if (badge) badge.outerHTML = c.html;
+        if (!c.active) {
+          const band = document.querySelector(".hw-band");
+          if (band) band.classList.add("shut");
+          const link = document.querySelector(".hw-band a.btn.gold");
+          if (link) link.outerHTML = `<span class="btn off" aria-disabled="true">الواجب مقفول</span>`;
+          clearInterval(hwTimer);
+        }
+      }, 1000);
+    }
   } catch { $("hw").innerHTML = `<p class="notice bad">تعذّر تحميل الواجب.</p>`; }
 
+  const yearCourses = courses ? courses.filter((c) => c.isParent) : [];
+  const termCourses = courses ? courses.filter((c) => !c.isParent) : [];
+  const calcYearLectures = (yearId) => termCourses.filter((t) => t.parentId === yearId).reduce((sum, t) => sum + (t.lectureCount || 0), 0);
   $("courses").innerHTML = !courses ? `<p class="notice bad">تعذّر تحميل الكورسات. حدّث الصفحة وجرّب تاني.</p>`
-    : courses.length ? courses.map((c, i) => `<article class="card"><div class="media">${cover(c, i)}</div><div class="body"><h3>${esc(c.title)}</h3><p>${esc(c.description || "")}</p><div class="row-end"><span class="pill">${(c.lectureCount || 0).toLocaleString("ar-EG")} محاضرة</span><a class="btn sm" href="courses.html#${esc(c.id)}">افتح الكورس</a></div></div></article>`).join("")
+    : yearCourses.length ? yearCourses.map((c, i) => `<article class="card"><div class="media">${cover(c, i)}</div><div class="body"><h3>${esc(c.title)}</h3><p>${esc(c.description || "")}</p><div class="row-end"><span class="pill">${calcYearLectures(c.id).toLocaleString("ar-EG")} محاضرات</span><a class="btn sm" href="courses.html#${esc(c.id)}">افتح الكورس</a></div></div></article>`).join("")
     : `<p class="empty">الكورسات هتظهر هنا أول ما الإدارة تضيفها.</p>`;
 
   if (ann && ann.length) {

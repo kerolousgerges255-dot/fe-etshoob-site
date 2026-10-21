@@ -9,8 +9,8 @@ export const firebaseConfig = {
 // 2) بيانات الموقع (غيّرها براحتك)
 export const SITE = {
   name: "في اتشوب",
-  institute: "معهد الكتاب المقدس — كاتدرائية الشهيد العظيم مار جرجس، العاشر من رمضان",
-  heroTitle: "ادرس الكتاب المقدس أونلاين في معهد في اتشوب",
+ 
+  heroTitle: "ادرس الكتاب المقدس في معهد في اتشوب",
   heroLead: "شوف المحاضرات، وحمّل ملف كل محاضرة، واقرأ التأملات، وتابع الإعلانات والواجب من مكان واحد.",
   verse: "سِرَاجٌ لِرِجْلِي كَلاَمُكَ وَنُورٌ لِسَبِيلِي.",
   verseRef: "مزمور ١١٩ : ١٠٥",
@@ -20,7 +20,8 @@ export const SITE = {
   links: {
     facebook: "https://www.facebook.com/profile.php?id=61560367155159",
     whatsapp: "https://wa.me/201555981300",
-    address: "كاتدرائية الشهيد العظيم مار جرجس - العاشر من رمضان - الشرقية"
+    // تليجرام: الرابط محفوظ في Firestore (لا يعرض في الكود)
+    telegram: "" // يحمّل من قاعدة البيانات للدارسين فقط
   }
 };
 
@@ -34,5 +35,5 @@ export const SECURITY = {
 // 4) الفيديو المحمي (Bunny Stream + Worker). سيبه فاضي لحد ما تجهّز الـ Worker (شوف docs/SECURITY.md)
 SITE.video = { worker: "" };           // مثال: "https://fe-etshoob-video.YOURNAME.workers.dev"
 
-// التأملات: false = للدارسين المسجّلين بس (الأأمن). true = مفتوحة للزوار
-SITE.publicMeditations = false;
+// التأملات: true = مفتوحة للزوار
+SITE.publicMeditations = true;

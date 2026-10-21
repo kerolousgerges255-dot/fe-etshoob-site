@@ -34,7 +34,7 @@ try:
 
         # ---- زائر
         x = page(); x.goto(B + "index.html?guest=1"); x.wait_for_timeout(1200); t = x.inner_text("body")
-        ok("زائر: مفيش محتوى محمي", not any(s in t for s in ["العهد القديم - الترم", "بدء محاضرات", "النور الذي", "واجب المحاضرة"]))
+        ok("زائر: مفيش محتوى محمي", not any(s in t for s in ["بدء محاضرات", "النور الذي", "واجب المحاضرة"]))
         ok("زائر: مفيش آية اليوم ولا حماية شغالة", x.locator(".votd").count() == 0 and x.locator(".shield-cover").count() == 0)
         ok("زائر: زرار دخول موجود", x.locator("[data-login]").count() >= 1); ok("زائر: مفيش أخطاء JS", not x.errs, x.errs)
         x.screenshot(path=f"{OUT}/guest.png", full_page=True); x.close()

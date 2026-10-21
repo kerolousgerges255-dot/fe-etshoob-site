@@ -8,12 +8,29 @@ const code = raw.split("\n").map((l) => l.replace(/\/\/.*$/, "")).join("\n");   
 test("قواعد Firestore: أي حاجة مش مذكورة مقفولة", () => {
   assert.match(code, /match \/\{document=\*\*\}\s*\{\s*allow read, write:\s*if false;/);
 });
-test("قواعد Firestore: مفيش قراءة مفتوحة للكل", () => { assert.ok(!/if true/.test(code), "فيه 'if true' في قاعدة"); });
+test("قواعد Firestore: مفيش قراءة مفتوحة للكل (ماعدا courses و meditations)", () => {
+  // courses و meditations allow read: if true مقصود (Tasks 4, 5)
+  const rulesExceptPublic = code
+    .replace(/match \/courses\/\{id\}\s*\{[^}]*allow read:\s*if true;[^}]*\}/, "")
+    .replace(/match \/meditations\/\{id\}\s*\{[^}]*allow read:\s*if true;[^}]*\}/, "");
+  assert.ok(!/if true/.test(rulesExceptPublic), "فيه 'if true' في قاعدة غير courses/meditations");
+});
 test("قواعد Firestore: كل المحتوى للدارسين المفعّلين، والكتابة للإدارة", () => {
-  for (const c of ["announcements", "meditations", "courses", "lectures", "homework"]) {
+  // meditations و courses: قراءة عامة (Tasks 4, 5)
+  for (const c of ["announcements", "lectures", "homework"]) {
     const m = code.match(new RegExp(`match /${c}/\\{id\\}\\s*\\{([^}]*)\\}`)); assert.ok(m, `مفيش قاعدة لـ ${c}`);
     assert.match(m[1], /allow read:\s*if isMember\(\)/, `${c}: القراءة`); assert.match(m[1], /allow write:\s*if isAdmin\(\)/, `${c}: الكتابة`);
   }
+  // courses: reading public, write admin
+  const coursesRule = code.match(/match \/courses\/\{id\}\s*\{([^}]*)\}/);
+  assert.ok(coursesRule, "مفيش قاعدة لـ courses");
+  assert.match(coursesRule[1], /allow read:\s*if true/, "courses: القراءة عامة");
+  assert.match(coursesRule[1], /allow write:\s*if isAdmin\(\)/, "courses: الكتابة للإدارة");
+  // meditations: reading public, write admin
+  const medsRule = code.match(/match \/meditations\/\{id\}\s*\{([^}]*)\}/);
+  assert.ok(medsRule, "مفيش قاعدة لـ meditations");
+  assert.match(medsRule[1], /allow read:\s*if true/, "meditations: القراءة عامة");
+  assert.match(medsRule[1], /allow write:\s*if isAdmin\(\)/, "meditations: الكتابة للإدارة");
 });
 test("قواعد Firestore: الحسابات والجلسات", () => {
   assert.match(code, /match \/users\/\{uid\}[\s\S]*?allow write:\s*if isAdmin\(\)/);
