@@ -32,10 +32,12 @@ if (!s.user) {
   const courses = coursesResult.status === "fulfilled" ? coursesResult.value : null;
   const meds = medsResult.status === "fulfilled" ? medsResult.value : null;
 
+  // عدد محاضرات السنة = مجموع lectureCount على ترماتها (الضيوف ما يقدرش يقرأ lectures)
+  const yearLecCount = (yearId) => (courses ? courses.filter((c) => !c.isParent && c.parentId === yearId).reduce((sum, t) => sum + (t.lectureCount || 0), 0) : 0);
   const yearCourses = courses ? courses.filter((c) => c.isParent) : [];
   if (yearCourses.length) {
     $("courses-sec").hidden = false;
-    $("courses").innerHTML = yearCourses.map((c, i) => `<article class="card"><div class="media">${cover(c, i)}</div><div class="body"><h3>${esc(c.title)}</h3><p>${esc(c.description || "")}</p><div class="row-end"><span class="pill">${(c.lectureCount || 0).toLocaleString("ar-EG")} محاضرات</span><span class="btn sm off" aria-disabled="true">متاح للدارسين</span></div></div></article>`).join("")
+    $("courses").innerHTML = yearCourses.map((c, i) => `<article class="card"><div class="media">${cover(c, i)}</div><div class="body"><h3>${esc(c.title)}</h3><p>${esc(c.description || "")}</p><div class="row-end"><span class="pill">${yearLecCount(c.id).toLocaleString("ar-EG")} محاضرات</span><span class="btn sm off" aria-disabled="true">متاح للدارسين</span></div></div></article>`).join("")
   } else {
     $("courses-sec").hidden = true;
     $("feat").hidden = false;
