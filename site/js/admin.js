@@ -2,6 +2,40 @@ import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/10.
 import { getAuth, createUserWithEmailAndPassword, signOut as signOutSec } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import { session, renderChrome, requireLogin, db, auth, firebaseConfig, toEmail, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, collection, getDocs, query, orderBy, serverTimestamp, increment, safeUrl, esc, fmtDate, toast } from "./app.js";
 
+// ── CSRF Protection ──────────────────────────────────────────────────────────
+// 生成一次CSRF token，每次写操作附带验证
+const csrfToken = (() => {
+  let token = sessionStorage.getItem("csrf-token");
+  if (!token) {
+    token = Array.from(crypto.getRandomValues(new Uint8Array(32)), (b) =>
+      b.toString(16).padStart(2, "0")
+    ).join("");
+    sessionStorage.setItem("csrfToken", token);
+  }
+  return token;
+})();
+
+// 在写入操作中添加CSRF token和时间戳
+async function csrfProtectedWrite(fn, ...args) {
+  const [ref, data] = args;
+  if (data && typeof data === "object") {
+    data._csrfToken = csrfToken;
+    data._csrfTime = Date.now();
+  }
+  try {
+    const result = await fn(...args);
+    toast("تمت العملية بنجاح");
+    return result;
+  } catch (e) {
+    if (e.code === "permission-denied") {
+      toast("خطأ: صلاحية غير كافية أو token غير صالح", true);
+    } else {
+      toast(`فشل: ${e.message || e.code}`, true);
+    }
+    throw e;
+  }
+}
+
 const s = await session();
 renderChrome("admin", s);
 const $ = (id) => document.getElementById(id);
@@ -62,20 +96,27 @@ async function crud(box, key) {
     try {
       const bump = (cid, n) => updateDoc(doc(db, "courses", cid), { lectureCount: increment(n) });
       if (editing) {
-        await updateDoc(doc(db, key, editing.id), v);
+        await csrfProtectedWrite(updateDoc, doc(db, key, editing.id), v);
         if (key === "lectures" && editing.data.courseId !== v.courseId) { await bump(editing.data.courseId, -1); await bump(v.courseId, 1); }
       } else {
-        await addDoc(collection(db, key), { ...v, createdAt: serverTimestamp() });
+        await csrfProtectedWrite(addDoc, collection(db, key), { ...v, createdAt: serverTimestamp() });
         if (key === "lectures") await bump(v.courseId, 1);
       }
-      toast("اتحفظ"); editing = null; form(); await load();
-    } catch { toast("فشل الحفظ. اتأكد من الصلاحيات.", true); }
+      editing = null; form(); await load();
+    } catch { /* handled in csrfProtectedWrite */ }
   };
   $("cancel").onclick = () => { editing = null; form(); };
   $("items").onclick = async (e) => {
     const id = e.target.dataset.e || e.target.dataset.d; if (!id) return;
     if (e.target.dataset.e) { editing = rows.find((r) => r.id === id); form(); scrollTo({ top: 0, behavior: "smooth" }); }
-    else if (confirm("متأكد إنك عايز تحذف؟")) { const gone = rows.find((r) => r.id === id); await deleteDoc(doc(db, key, id)); if (key === "lectures" && gone) await updateDoc(doc(db, "courses", gone.data.courseId), { lectureCount: increment(-1) }); toast("اتحذف"); await load(); }
+    else if (confirm("متأكد إنك عايز تحذف؟")) {
+      try {
+        const gone = rows.find((r) => r.id === id);
+        await csrfProtectedWrite(deleteDoc, doc(db, key, id));
+        if (key === "lectures" && gone) await updateDoc(doc(db, "courses", gone.data.courseId), { lectureCount: increment(-1) });
+        await load();
+      } catch { /* handled */ }
+    }
   };
   form(); await load();
 }
@@ -117,9 +158,9 @@ async function students(box) {
   $("items").onclick = async (e) => {
     const t = e.target.dataset;
     try {
-      if (t.a) await updateDoc(doc(db, "users", t.a), { active: t.v === "1" });
-      else if (t.r) await updateDoc(doc(db, "users", t.r), { role: t.v });
-      else if (t.x && confirm("هيتشال وصول الدارس ده للموقع. متأكد؟")) await deleteDoc(doc(db, "users", t.x));
+      if (t.a) await csrfProtectedWrite(updateDoc, doc(db, "users", t.a), { active: t.v === "1" });
+      else if (t.r) await csrfProtectedWrite(updateDoc, doc(db, "users", t.r), { role: t.v });
+      else if (t.x && confirm("هيتشال وصول الدارس ده للموقع. متأكد؟")) await csrfProtectedWrite(deleteDoc, doc(db, "users", t.x));
       else return;
       await load();
     } catch { toast("فشلت العملية", true); }

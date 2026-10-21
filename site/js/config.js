@@ -20,9 +20,8 @@ export const SITE = {
   links: {
     facebook: "https://www.facebook.com/profile.php?id=61560367155159",
     whatsapp: "https://wa.me/201555981300",
-    // تليجرام الدارسين (مشفر Base64 عشان ميبقاش ظاهر في Source)
-    telegram: "aHR0cHM6Ly90Lm1lLyt5RENNbkM1V3VqYzNOR0Uw",
-    address: "معهد في اتشوب - كاتدرائية الشهيد العظيم مار جرجس - العاشر من رمضان - الشرقية"
+    // تليجرام: الرابط محفوظ في Firestore (لا يعرض في الكود)
+    telegram: "" // يحمّل من قاعدة البيانات للدارسين فقط
   }
 };
 

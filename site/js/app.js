@@ -84,11 +84,13 @@ export function renderChrome(active, s) {
       <nav aria-label="القائمة الرئيسية">${links.map(([k, h, l]) => `<a href="${h}"${k === active ? ' aria-current="page"' : ""}>${l}</a>`).join("")}</nav>
       <div class="acct">${s.user ? `<span class="who">${esc(s.profile.name)}</span><button id="logout" class="btn ghost sm">خروج</button>` : `<button class="btn gold sm" data-login>دخول الدارسين</button>`}</div>
     </div></div>`;
-  const social = ["facebook"].filter((k) => L[k]).map((k) => `<a href="${esc(safeUrl(L[k]))}" target="_blank" rel="noopener" aria-label="${k}"><svg viewBox="0 0 24 24" fill="currentColor">${ICONS[k]}</svg></a>`);
-  if (L.whatsapp) social.push(`<a href="${esc(safeUrl(L.whatsapp))}" target="_blank" rel="noopener" aria-label="whatsapp"><svg viewBox="0 0 24 24" fill="currentColor">${ICONS.whatsapp}</svg></a>`);
-  // Decode base64 telegram link
-  const tgLink = s.user && L.telegram ? decodeURIComponent(escape(atob(L.telegram))) : "";
-  const telegramLink = tgLink ? `<a href="${esc(safeUrl(tgLink))}" target="_blank" rel="noopener" aria-label="telegram" style="color:var(--gold);text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;margin-block-start:.8rem"><svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;flex:none">${ICONS.telegram}</svg>جروب التليجرام للدارسين</a>` : "";
+  const social = ["facebook"].filter((k) => L[k]).map((k) => `<a href="${esc(safeUrl(L[k]))}" target="_blank" rel="noopener noreferrer" aria-label="${k}"><svg viewBox="0 0 24 24" fill="currentColor">${ICONS[k]}</svg></a>`);
+  if (L.whatsapp) social.push(`<a href="${esc(safeUrl(L.whatsapp))}" target="_blank" rel="noopener noreferrer" aria-label="whatsapp"><svg viewBox="0 0 24 24" fill="currentColor">${ICONS.whatsapp}</svg></a>`);
+  // تليجرام: يحمّل من Firestore للدارسين فقط (مش ظاهر في Source Code)
+  let telegramLink = "";
+  if (s.user && L.telegram) {
+    telegramLink = `<a href="${esc(safeUrl(L.telegram))}" target="_blank" rel="noopener noreferrer" aria-label="telegram" style="color:var(--gold);text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;margin-block-start:.8rem"><svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;flex:none">${ICONS.telegram}</svg>جروب التليجرام للدارسين</a>`;
+  }
   document.getElementById("site-footer").innerHTML = `
     <div class="fband" aria-hidden="true"></div>
     <div class="wrap fgrid">

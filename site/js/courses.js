@@ -155,12 +155,21 @@ if (requireLogin(s)) {
       const vd = document.getElementById("vdlg");
       vd.showModal();
       try {
-        const token = await auth.currentUser.getIdToken();
-        const r = await fetch(`${SITE.video.worker}/embed?video=${encodeURIComponent(playBtn.dataset.play)}`, { headers: { Authorization: "Bearer " + token } });
-        if (!r.ok) throw new Error(r.status);
+        if (!auth.currentUser) throw new Error("غير مصدق");
+        // استخدام getIdTokenResult للحصول على JWT مختصر العمر
+        const tokenResult = await auth.currentUser.getIdTokenResult();
+        const r = await fetch(`${SITE.video.worker}/embed?video=${encodeURIComponent(playBtn.dataset.play)}`, {
+          headers: { "Authorization": `Bearer ${tokenResult.token}` }
+        });
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
         const { url } = await r.json();
         vbox.innerHTML = `<iframe src="${esc(url)}" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>`;
-      } catch { vbox.innerHTML = `<p class="empty">تعذّر تشغيل الفيديو. حدّث الصفحة وجرّب تاني.</p>`; }
+      } catch (err) {
+        const msg = err?.message?.includes("غير مصدق")
+          ? "يجب تسجيل الدخول أولاً"
+          : "تعذّر تشغيل الفيديو. حدّث الصفحة وجرّب تاني.";
+        vbox.innerHTML = `<p class="empty">${msg}</p>`;
+      }
     }
   });
 

@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#7a1f17">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com https://www.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src 'self' https:; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com;">
+<meta http-equiv="X-Frame-Options" content="DENY">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-XSS-Protection" content="1; mode=block">
 <meta name="description" content="في اتشوب — معهد الكتاب المقدس. من نحن، رسالتنا، نظام الدراسة، وفريق العمل.">
 <meta property="og:title" content="من نحن — في اتشوب">
 <meta property="og:image" content="images/og.jpg">
@@ -15,14 +19,18 @@
 /* About page specific styles */
 .about-hero {
   text-align: center;
-  padding: 2rem 1rem;
-  margin-block-start: 2rem;
+  padding: .5rem 1.8rem;
+  margin-block-start: 1rem;
   background: linear-gradient(135deg, var(--blood-deep) 0%, var(--blood) 100%);
   color: #fff;
-  border-radius: 16px;
+  border-radius: 12px;
   font-size: 1.4rem;
   font-weight: 600;
   letter-spacing: 0.1em;
+}
+
+.about-hero h1 {
+  color: #fff;
 }
 
 .about-section {
@@ -114,8 +122,12 @@
 }
 
 @media (max-width: 768px) {
+  .about-hero {
+    padding: 1.5rem 0.3rem;
+  }
+
   .about-hero h1 {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
   }
 
   .about-hero .logo-wrap img {
@@ -149,10 +161,18 @@
 <main>
   <!-- Hero Section -->
   <div class="about-hero">
-    <h1>من نحن</h1>
+    <h1 style="color:#fff">من نحن</h1>
   </div>
 
   <div class="wrap page-body">
+    <!-- Mission Section -->
+    <section class="about-section">
+      <h2>شعار المعهد</h2>
+      <p>
+        نقرأ وندرس ... لنحيا ونكرز
+      </p>
+      
+    </section>
     <!-- Mission Section -->
     <section class="about-section">
       <h2>رسالتنا</h2>
