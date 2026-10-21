@@ -47,7 +47,7 @@ if (!s.user) {
   if (SITE.publicMeditations) {
     $("meds").innerHTML = meds && meds.length ? meds.slice(0, 3).map((m, i) => `<article class="card"><div class="media">${cover(m, i + 1)}</div><div class="body"><span class="meta">${esc([m.author, fmtDate(m.createdAt)].filter(Boolean).join("، "))}</span><h3>${esc(m.title)}</h3><p>${esc(excerpt(m.body))}</p><div class="row-end"><a class="btn ghost sm" href="meditations.html#${esc(m.id)}">اقرأ التأمل</a></div></div></article>`).join("") : `<p class="empty">لسه مفيش تأملات.</p>`;
   } else $("meds-sec").hidden = true;
-  $("cta").innerHTML = `<div class="cta"><h2>جاهز تبدأ؟</h2><p>سجل دخولك الان.</p><button class="btn" data-login>دخول الدارسين</button></div>`;
+  $("cta").innerHTML = `<div class="cta"><h2>جاهز تبدأ؟</h2><p>سجل دخولك الآن.</p><button class="btn" data-login>دخول الدارسين</button></div>`;
 } else {
   const [ann, meds, courses] = await Promise.allSettled([
     get("announcements", orderBy("createdAt", "desc"), limit(20)),
