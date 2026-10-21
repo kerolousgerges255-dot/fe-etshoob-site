@@ -68,10 +68,12 @@ if (!s.user) {
       const days = Math.floor(diff / 86400000);
       const hours = Math.floor((diff % 86400000) / 3600000);
       const mins = Math.floor((diff % 3600000) / 60000);
+      const secs = Math.floor((diff % 60000) / 1000);
       const s = [];
       if (days) s.push(`${days.toLocaleString("ar-EG")} يوم`);
       if (hours) s.push(`${hours.toLocaleString("ar-EG")} ساعة`);
       if (mins || !s.length) s.push(`${mins.toLocaleString("ar-EG")} دقيقة`);
+      if (secs > 0 || !s.length) s.push(`${secs.toLocaleString("ar-EG")} ثانية`);
       return { html: `<span class="chip deadline">باقي ${s.join(" و")}</span>`, active: true };
     };
     const countdown = updateCountdown();
