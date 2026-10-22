@@ -21,6 +21,7 @@ service cloud.firestore {
     match /courses/{id}       { allow read: if true; allow write: if isAdmin(); }  // metadata عامة للكورسات (للضيوف)
     match /lectures/{id}      { allow read: if isMember(); allow write: if isAdmin(); }
     match /homework/{id}      { allow read: if isMember(); allow write: if isAdmin(); }
+    match /contact/{id}       { allow read: if isAdmin(); allow write: if true; }
 
     // أي حاجة تانية مقفولة
     match /{document=**} { allow read, write: if false; }

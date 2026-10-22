@@ -97,7 +97,7 @@ export function renderChrome(active, s) {
     <div class="wrap fgrid">
       <div><span class="plate"><img src="images/logo.png" alt=""></span><p>${esc(SITE.tagline || SITE.heroLead)}</p>${social.length ? `<div class="social">${social.join("")}</div>` : ""}${telegramLink}</div>
       <div><h4>روابط سريعة</h4><ul>${links.map(([, h, l]) => `<li><a href="${h}">${l}</a></li>`).join("")}${contactEmail ? `<li><a href="javascript:void(0)" id="open-contact" style="color:var(--gold)">📩 تواصل معنا</a></li>` : ""}</ul></div>
-      <div><h4>المعهد</h4><span class="plate"><img src="images/cathedral.png" alt=""></span><p>${esc(SITE.institute)}</p>${SITE.instituteInfo ? `<p style="white-space:pre-line">${esc(SITE.instituteInfo)}</p>` : ""}${L.address ? `<p>${esc(L.address)}</p>` : ""}${contactEmail ? `<p style="margin-block-start:.6rem"><a href="mailto:${esc(contactEmail)}" style="color:var(--gold)">📧 ${esc(contactEmail)}</a></p>` : ""}</div>
+      <div><h4>المعهد</h4><span class="plate"><img src="images/cathedral.png" alt=""></span><p>${esc(SITE.institute)}</p>${SITE.instituteInfo ? `<p style="white-space:pre-line">${esc(SITE.instituteInfo)}</p>` : ""}${L.address ? `<p>${esc(L.address)}</p>` : ""}</div>
     </div>
     <div class="copy">© ${new Date().getFullYear()} ${esc(SITE.name)} — معهد الكتاب المقدس</div>`;
   document.getElementById("logout")?.addEventListener("click", async () => { await signOut(auth); location.href = "index.html"; });
@@ -131,7 +131,6 @@ export function renderChrome(active, s) {
       <label for="cb">الرسالة</label>
       <textarea id="cb" placeholder="اكتب رسالتك هنا..."></textarea>
       <button class="btn block" data-csend>إرسال</button>
-      <p class="meta" style="margin-block-start:.5rem">أو اكتبنا على <a href="mailto:${esc(SITE.contactEmail)}" style="color:var(--gold)">${esc(SITE.contactEmail)}</a></p>
     </div>`;
     document.body.appendChild(cd);
     cd.addEventListener("click", (e) => { if (e.target === cd) cd.close(); });
