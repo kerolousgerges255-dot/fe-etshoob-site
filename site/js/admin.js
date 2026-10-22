@@ -158,7 +158,7 @@ async function students(box) {
   <p>للعمليات دي لازم <strong>Firebase Admin SDK</strong> (Node.js في السكريبتات):</p>
   <ul>
     <li>🔐 <strong>تغيير الباسوورد</strong> → <code>node scripts/reset-password.mjs email@domain.com "NewPass123"</code></li>
-    <li>🗑️ <strong>حذف من Auth</strong> → <code>node scripts/delete-user.mjs email@domain.com</code></li>
+    <li>🗑️ <strong>حذف من Auth</strong> → يتم تلقائياً عند الحذف من الموقع</li>
     <li>🚫 <strong>إيقاف/تفعيل في Auth</strong> → <code>node scripts/toggle-user.mjs email@domain.com disable|enable</code></li>
     <li>📋 <strong>عرض كل اليوزرز</strong> → <code>node scripts/export-users-local.mjs</code></li>
   </ul>
@@ -176,7 +176,18 @@ async function students(box) {
     try {
       if (t.a) await csrfProtectedWrite(updateDoc, doc(db, "users", t.a), { active: t.v === "1" });
       else if (t.r) await csrfProtectedWrite(updateDoc, doc(db, "users", t.r), { role: t.v });
-      else if (t.x && confirm("هيتشال وصول الدارس ده من Firestore. للحذف من Auth استعمل CLI. متأكد؟")) await csrfProtectedWrite(deleteDoc, doc(db, "users", t.x));
+      else if (t.x && confirm("هيتشال الدارس ده من Firestore ومن Firebase Auth. متأكد؟")) {
+        try {
+          await csrfProtectedWrite(deleteDoc, doc(db, "users", t.x));
+          // Delete from Firebase Auth too
+          const sec = initializeApp(firebaseConfig, "sec-" + Date.now());
+          try {
+            await deleteUser(getAuth(sec), t.x);
+          } finally { deleteApp(sec); }
+          toast("تم الحذف من الموقع وفاير بيز");
+          await load();
+        } catch { toast("حصلت مشكلة في الحذف", true); }
+      }
       else return;
       await load();
     } catch { toast("فشلت العملية", true); }
