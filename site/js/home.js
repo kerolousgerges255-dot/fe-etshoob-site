@@ -65,19 +65,22 @@ if (!s.user) {
   $("votd").innerHTML = `<div class="votd"><span class="votd-l">آية اليوم</span><p>${esc(v.t)}</p><span class="meta">${esc(v.r)}</span></div>`;
 
   // ── Homework section ──────────────────────────────────────────────────────────
-  // العداد بيظهر بس لو الواجب شغال وفيه لينك وفيه deadline لسه في المستقبل.
-  // لو الواجب مقفول أو مفيش لينك ← يظهر "مقفول" من غير عداد.
+  // Band يظهر دايماً.
+  // - مفيش لينك      → "مفيش واجب مفتوح دلوقتي"          من غير عداد
+  // - فيه لينك + مقفول → "الواجب مقفول"                  من غير عداد
+  // - فيه لينك + شغال → countdown بيعد (لو فيه deadline)
   (async () => {
     try {
       const h = (await getDoc(doc(db, "homework", "current"))).data();
       const open = !!(h && h.active && safeUrl(h.url));
       const dl = h?.deadline ? new Date(h.deadline).getTime() : null;
+      const hasDeadline = !!dl;
 
       const updateCountdown = () => {
         if (!dl) return { html: "", active: false };
         const now = Date.now();
         const diff = dl - now;
-        if (diff <= 0) return { html: `<span class="chip off">انتهى</span>`, active: false };
+        if (diff <= 0) return { html: "", active: false };
         const days = Math.floor(diff / 86400000);
         const hours = Math.floor((diff % 86400000) / 3600000);
         const mins = Math.floor((diff % 3600000) / 60000);
@@ -90,22 +93,27 @@ if (!s.user) {
         return { html: `<span class="chip deadline">باقي ${s.join(" و")}</span>`, active: true };
       };
       const countdown = updateCountdown();
-      const isAlive = open && (!dl || dl > Date.now());
-      $("hw").innerHTML = `<div class="hw-band${isAlive ? "" : " shut"}"><div class="hw-info"><h3>${esc(h?.title || "واجب المحاضرة")}</h3><p>${isAlive ? "الواجب مفتوح دلوقتي، ادخل وابدأ." : "مفيش واجب مفتوح دلوقتي."}</p></div><div class="hw-actions">${countdown.active && isAlive ? `<span class="chip deadline">${countdown.html}</span>` : ""}${isAlive ? `<a class="btn gold" href="${esc(safeUrl(h.url))}" target="_blank" rel="noopener">ابدأ الواجب</a>` : `<span class="btn off" aria-disabled="true">الواجب مقفول</span>`}</div></div>`;
-      // تحديث العداد كل ثانية لو فيه deadline والواجب شغال
+      const isAlive = open && (!hasDeadline || dl > Date.now());
+      let bandText, buttonHtml;
+      if (!h || !h.url) {
+        bandText = "مفيش واجب مفتوح دلوقتي.";
+        buttonHtml = `<span class="btn off" aria-disabled="true">مفيش لينك</span>`;
+      } else if (!isAlive) {
+        bandText = "الواجب مقفول دلوقتي.";
+        buttonHtml = `<span class="btn off" aria-disabled="true">الواجب مقفول</span>`;
+      } else {
+        bandText = "الواجب مفتوح دلوقتي، ادخل وابدأ.";
+        buttonHtml = `<a class="btn gold" href="${esc(safeUrl(h.url))}" target="_blank" rel="noopener">ابدأ الواجب</a>`;
+      }
+      $("hw").innerHTML = `<div class="hw-band${isAlive ? "" : " shut"}"><div class="hw-info"><h3>${esc(h?.title || "واجب المحاضرة")}</h3><p>${bandText}</p></div><div class="hw-actions">${countdown.active ? `<span class="chip deadline">${countdown.html}</span>` : ""}${buttonHtml}</div></div>`;
+      // تحديث العداد كل ثانية لو الواجب شغال وفيه deadline
       let hwTimer = null;
-      if (dl && countdown.active && isAlive) {
+      if (open && hasDeadline && isAlive) {
         hwTimer = setInterval(() => {
           const c = updateCountdown();
           const chip = document.querySelector(".hw-band .chip");
           if (chip) chip.outerHTML = c.html;
-          if (!c.active) {
-            const band = document.querySelector(".hw-band");
-            if (band) band.classList.add("shut");
-            const link = document.querySelector(".hw-band a.btn.gold");
-            if (link) link.outerHTML = `<span class="btn off" aria-disabled="true">الواجب مقفول</span>`;
-            clearInterval(hwTimer);
-          }
+          if (!c.active) clearInterval(hwTimer);
         }, 1000);
       }
     } catch { $("hw").innerHTML = `<p class="notice bad">تعذّر تحميل الواجب.</p>`; }
