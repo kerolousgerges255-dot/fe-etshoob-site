@@ -174,7 +174,23 @@ async function students(box) {
   $("items").onclick = async (e) => {
     const t = e.target.dataset;
     try {
-      if (t.a) await csrfProtectedWrite(updateDoc, doc(db, "users", t.a), { active: t.v === "1" });
+      if (t.a) {
+        const newActive = t.v === "1";
+        await csrfProtectedWrite(updateDoc, doc(db, "users", t.a), { active: newActive });
+        // Sync with Firebase Auth (disable/enable account)
+        const sec = initializeApp(firebaseConfig, "sec-" + Date.now());
+        try {
+          const auth = getAuth(sec);
+          if (newActive) {
+            await auth.updateUser(t.a, { disabled: false });
+          } else {
+            await auth.updateUser(t.a, { disabled: true });
+          }
+        } catch (authErr) {
+          console.error("Auth sync error:", authErr.code || authErr.message);
+          // Don't block Firestore update if Auth sync fails
+        } finally { deleteApp(sec); }
+      }
       else if (t.r) await csrfProtectedWrite(updateDoc, doc(db, "users", t.r), { role: t.v });
       else if (t.x && confirm("هيتشال الدارس ده من Firestore ومن Firebase Auth. متأكد؟")) {
         try {
