@@ -150,21 +150,6 @@ async function students(box) {
     <p><button class="btn" id="add">إضافة</button> <button class="btn alt" id="gen">توليد كلمة مرور</button></p><pre id="cred" dir="ltr" style="white-space:pre-wrap"></pre></div>
     <div class="panel"><h2>الدارسين</h2><div id="items"></div></div>`;
 
-  // Info panel explaining the sync
-  const info = document.createElement("div");
-  info.className = "panel";
-  info.innerHTML = `<h3>⚠️ ملاحظة هامة: التزامن مع Firebase Auth</h3>
-  <p>العمليات هنا بتأثر على <strong>Firestore بس</strong> (البروفايل، الدور، الحالة).</p>
-  <p>للعمليات دي لازم <strong>Firebase Admin SDK</strong> (Node.js في السكريبتات):</p>
-  <ul>
-    <li>🔐 <strong>تغيير الباسوورد</strong> → <code>node scripts/reset-password.mjs email@domain.com "NewPass123"</code></li>
-    <li>🗑️ <strong>حذف من Auth</strong> → يتم تلقائياً عند الحذف من الموقع</li>
-    <li>🚫 <strong>إيقاف/تفعيل في Auth</strong> → <code>node scripts/toggle-user.mjs email@domain.com disable|enable</code></li>
-    <li>📋 <strong>عرض كل اليوزرز</strong> → <code>node scripts/export-users-local.mjs</code></li>
-  </ul>
-  <p>السكريبتات دي في فولدر <code>scripts/</code> وتشغل محلياً على جهازك.</p>`;
-  box.prepend(info);
-
   const gen = () => { const c = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789"; return Array.from(crypto.getRandomValues(new Uint8Array(10)), (b) => c[b % c.length]).join(""); };
   $("gen").onclick = () => ($("pw").value = gen());
   async function load() {
