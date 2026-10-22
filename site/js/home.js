@@ -65,20 +65,13 @@ if (!s.user) {
   $("votd").innerHTML = `<div class="votd"><span class="votd-l">آية اليوم</span><p>${esc(v.t)}</p><span class="meta">${esc(v.r)}</span></div>`;
 
   // ── Homework section ──────────────────────────────────────────────────────────
-  // يعرض القسم لو الواجب مفتوح ولديه رابط صالح.
-  // لو مفيش رابط أو مفيش واجب ← القسم مخفي بالكامل.
-  // العداد بيشتغل بس لو فيه deadline والواجب لسه شغال.
+  // العداد بيظهر بس لو الواجب شغال وفيه لينك وفيه deadline لسه في المستقبل.
+  // لو الواجب مقفول أو مفيش لينك ← يظهر "مقفول" من غير عداد.
   (async () => {
     try {
       const h = (await getDoc(doc(db, "homework", "current"))).data();
       const open = !!(h && h.active && safeUrl(h.url));
       const dl = h?.deadline ? new Date(h.deadline).getTime() : null;
-
-      // لو مفيش واجب مفتوح برابط صحيح → أخفي القسم تماماُ
-      if (!open) {
-        $("hw").hidden = true;
-        return;
-      }
 
       const updateCountdown = () => {
         if (!dl) return { html: "", active: false };
@@ -97,22 +90,20 @@ if (!s.user) {
         return { html: `<span class="chip deadline">باقي ${s.join(" و")}</span>`, active: true };
       };
       const countdown = updateCountdown();
-      const isAlive = !dl || dl > Date.now();
-      const badge = countdown.html || `<span class="chip on">مفتوح</span>`;
-      $("hw").hidden = false;
-      $("hw").innerHTML = `<div class="hw-band${isAlive ? "" : " shut"}"><div class="hw-info"><h3>${esc(h?.title || "واجب المحاضرة")}</h3><p>${isAlive ? "الواجب مفتوح دلوقتي، ادخل وابدأ." : "الواجب انتهى."}</p></div><div class="hw-actions">${countdown.active ? `<span class="chip deadline">${countdown.html}</span>` : ""}${isAlive ? `<a class="btn gold" href="${esc(safeUrl(h.url))}" target="_blank" rel="noopener">ابدأ الواجب</a>` : `<span class="btn off" aria-disabled="true">الواجب انتهى</span>`}</div></div>`;
-      // تحديث العداد كل ثانية لو فيه deadline والواجب مفتوح
+      const isAlive = open && (!dl || dl > Date.now());
+      $("hw").innerHTML = `<div class="hw-band${isAlive ? "" : " shut"}"><div class="hw-info"><h3>${esc(h?.title || "واجب المحاضرة")}</h3><p>${isAlive ? "الواجب مفتوح دلوقتي، ادخل وابدأ." : "مفيش واجب مفتوح دلوقتي."}</p></div><div class="hw-actions">${countdown.active && isAlive ? `<span class="chip deadline">${countdown.html}</span>` : ""}${isAlive ? `<a class="btn gold" href="${esc(safeUrl(h.url))}" target="_blank" rel="noopener">ابدأ الواجب</a>` : `<span class="btn off" aria-disabled="true">الواجب مقفول</span>`}</div></div>`;
+      // تحديث العداد كل ثانية لو فيه deadline والواجب شغال
       let hwTimer = null;
-      if (dl && countdown.active) {
+      if (dl && countdown.active && isAlive) {
         hwTimer = setInterval(() => {
           const c = updateCountdown();
-          const badge = document.querySelector(".hw-band .chip");
-          if (badge) badge.outerHTML = c.html;
+          const chip = document.querySelector(".hw-band .chip");
+          if (chip) chip.outerHTML = c.html;
           if (!c.active) {
             const band = document.querySelector(".hw-band");
             if (band) band.classList.add("shut");
             const link = document.querySelector(".hw-band a.btn.gold");
-            if (link) link.outerHTML = `<span class="btn off" aria-disabled="true">الواجب انتهى</span>`;
+            if (link) link.outerHTML = `<span class="btn off" aria-disabled="true">الواجب مقفول</span>`;
             clearInterval(hwTimer);
           }
         }, 1000);
