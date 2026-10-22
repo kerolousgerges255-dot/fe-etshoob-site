@@ -88,9 +88,9 @@ if (!s.user) {
     const isAlive = open && (!dl || dl > Date.now());
     const badge = countdown.html || (open ? `<span class="chip on">مفتوح</span>` : `<span class="chip off">مقفول</span>`);
     $("hw").innerHTML = `<div class="hw-band${isAlive ? "" : " shut"}"><div class="hw-info"><h3>${esc(h?.title || "واجب المحاضرة")}</h3><p>${isAlive ? "الواجب مفتوح دلوقتي، ادخل وابدأ." : "مفيش واجب مفتوح دلوقتي."}</p></div><div class="hw-actions">${countdown.active ? `<span class="chip deadline">${countdown.html}</span>` : ""}${isAlive ? `<a class="btn gold" href="${esc(safeUrl(h.url))}" target="_blank" rel="noopener">ابدأ الواجب</a>` : `<span class="btn off" aria-disabled="true">الواجب مقفول</span>`}</div></div>`;
-    // تحديث العداد كل ثانية لو فيه deadline
+    // تحديث العداد كل ثانية لو فيه deadline والواجب مفتوح
     let hwTimer = null;
-    if (dl && countdown.active) {
+    if (open && dl && countdown.active) {
       hwTimer = setInterval(() => {
         const c = updateCountdown();
         const badge = document.querySelector(".hw-band .chip");
