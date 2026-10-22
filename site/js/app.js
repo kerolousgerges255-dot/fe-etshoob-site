@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, collection, getDocs, query, orderBy, limit, serverTimestamp, increment, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import { firebaseConfig, SITE } from "./config.js";
 import { protect } from "./shield.js";
@@ -9,7 +9,7 @@ export const configured = !firebaseConfig.apiKey.startsWith("PASTE");
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-export { doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, collection, getDocs, query, orderBy, limit, serverTimestamp, increment, onSnapshot, signOut, SITE, firebaseConfig, signInAnonymously };
+export { doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, collection, getDocs, query, orderBy, limit, serverTimestamp, increment, onSnapshot, signOut, SITE, firebaseConfig };
 
 export { toEmail, esc, fmtDate, excerpt, renderText, safeUrl, viewUrl, downloadUrl };
 
@@ -95,7 +95,7 @@ export function renderChrome(active, s) {
     <div class="fband" aria-hidden="true"></div>
     <div class="wrap fgrid">
       <div><span class="plate"><img src="images/logo.png" alt=""></span><p>${esc(SITE.tagline || SITE.heroLead)}</p>${social.length ? `<div class="social">${social.join("")}</div>` : ""}${telegramLink}</div>
-      <div><h4>روابط سريعة</h4><ul>${links.map(([, h, l]) => `<li><a href="${h}">${l}</a></li>`).join("")}<li><button id="open-contact" style="background:none;border:0;padding:0;color:var(--gold);cursor:pointer;text-align:right;font:inherit">📩 تواصل معنا</button></li></ul></div>
+      <div><h4>روابط سريعة</h4><ul>${links.map(([, h, l]) => `<li><a href="${h}">${l}</a></li>`).join("")}</ul></div>
       <div><h4>المعهد</h4><span class="plate"><img src="images/cathedral.png" alt=""></span><p>${esc(SITE.institute)}</p>${SITE.instituteInfo ? `<p style="white-space:pre-line">${esc(SITE.instituteInfo)}</p>` : ""}${L.address ? `<p>${esc(L.address)}</p>` : ""}</div>
     </div>
     <div class="copy">© ${new Date().getFullYear()} ${esc(SITE.name)} — معهد الكتاب المقدس</div>`;
@@ -113,61 +113,6 @@ export function renderChrome(active, s) {
     document.body.appendChild(d);
     d.addEventListener("click", (e) => { if (e.target === d || e.target.hasAttribute("data-close")) d.close(); });
     bindLogin(d, () => location.reload());
-  }
-  // contact dialog — ظاهر للزوار والدارسين على حد سواء
-  {
-    const cd = document.createElement("dialog");
-    cd.id = "contact-dlg"; cd.className = "dlg";
-    cd.innerHTML = `<div class="dlg-in dlg-in-contact">
-      <button class="x" aria-label="إغلاق" data-close>×</button>
-      <h2>تواصل معنا</h2>
-      <p class="meta">اكتب رسالتك أو مشكلتك وإحنا هنرد عليك في أقرب وقت.</p>
-      <div data-cmsg role="alert"></div>
-      <label for="cn">الاسم</label>
-      <input id="cn" autocomplete="name" placeholder="اسمك (اختياري)">
-      <label for="cb">الرسالة</label>
-      <textarea id="cb" placeholder="اكتب رسالتك هنا..."></textarea>
-      <button class="btn block" data-csend>إرسال</button>
-    </div>`;
-    document.body.appendChild(cd);
-    cd.addEventListener("click", (e) => { if (e.target === cd || e.target.hasAttribute("data-close")) cd.close(); });
-    cd.addEventListener("keydown", (e) => { if (e.key === "Escape") cd.close(); });
-    const csend = cd.querySelector("[data-csend]"), cmsg = cd.querySelector("[data-cmsg]");
-    let anonSignedIn = false;
-    let emailSent = false;
-    csend.onclick = async () => {
-      const name = cd.querySelector("#cn").value.trim(), body = cd.querySelector("#cb").value.trim();
-      if (!body) { cmsg.innerHTML = `<p class="notice bad">اكتب رسالتك الأول.</p>`; return; }
-      csend.disabled = true;
-      try {
-        // Sign in anonymously if not already done (needed for Firestore write even with public rules)
-        if (!anonSignedIn) {
-          await signInAnonymously(auth);
-          anonSignedIn = true;
-        }
-        // Save to Firestore
-        const docRef = await addDoc(collection(db, "contact"), { name, body, createdAt: serverTimestamp() });
-        // Send email notification using EmailJS
-        if (typeof emailjs !== 'undefined') {
-          try {
-            await emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
-              from_name: name || 'زيّار',
-              message: body,
-              to_email: 'fietshop10@gmail.com'
-            });
-            emailSent = true;
-          } catch (e) {
-            console.log('Email send failed (optional):', e);
-          }
-        }
-        cmsg.innerHTML = `<p class="notice">تم إرسال رسالتك، هنتواصل معاك في أقرب وقت. شكراً ليك!</p>`;
-        cd.querySelector("#cn").value = ""; cd.querySelector("#cb").value = "";
-      } catch { cmsg.innerHTML = `<p class="notice bad">حصلت مشكلة. جرب تاني أو اكتبنا على الإيميل مباشرة.</p>`; }
-      finally { csend.disabled = false; }
-    };
-    document.addEventListener("click", (e) => {
-      if (e.target.closest("#open-contact")) cd.showModal();
-    });
   }
   document.addEventListener("click", (e) => {
     if (!e.target.closest("[data-login]")) return;

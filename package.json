@@ -12,9 +12,29 @@
     "video": "python scripts/record_demo.py"
   },
   "dependencies": {
-    "firebase-admin": "^14.5.0"
+    "firebase-admin": "^14.5.0",
+    "firebase-functions": "^7.4.0",
+    "nodemailer": "^10.2.1"
   },
   "engines": {
     "node": ">=20"
-  }
+  },
+  "version": "1.0.0",
+  "description": "موقع للدارسين: دخول بيوزر وباسورد، محاضرات PDF محمية، تأملات عامة، إعلانات، وزرار واجب بيتفتح ويتقفل من لوحة الإدارة.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kerolousgerges255-dot/fe-etshoob-site.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kerolousgerges255-dot/fe-etshoob-site/issues"
+  },
+  "homepage": "https://github.com/kerolousgerges255-dot/fe-etshoob-site#readme"
 }

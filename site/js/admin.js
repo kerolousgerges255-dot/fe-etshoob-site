@@ -56,13 +56,13 @@ const SECTIONS = {
     { k: "pdfUrl", l: "رابط PDF (Google Drive)", t: "url", hint: "ارفع الملف على Drive > Share > Anyone with the link > انسخ الرابط." },
     { k: "order", l: "الترتيب (رقم)", t: "number" }] }
 };
-const TABS = [...Object.keys(SECTIONS).slice(0, 2), "homework", "courses", "lectures", "students", "contact"];
-const LABELS = { homework: "الواجب", students: "الدارسين", contact: "الرسائل", ...Object.fromEntries(Object.entries(SECTIONS).map(([k, v]) => [k, v.label])) };
+const TABS = [...Object.keys(SECTIONS).slice(0, 2), "homework", "courses", "lectures", "students"];
+const LABELS = { homework: "الواجب", students: "الدارسين", ...Object.fromEntries(Object.entries(SECTIONS).map(([k, v]) => [k, v.label])) };
 
 function open(t) {
   document.querySelectorAll("#tabs button").forEach((b) => b.setAttribute("aria-selected", b.dataset.t === t));
   panel.innerHTML = "";
-  (t === "homework" ? homework : t === "students" ? students : t === "contact" ? contact : (box) => crud(box, t))(panel);
+  (t === "homework" ? homework : t === "students" ? students : (box) => crud(box, t))(panel);
 }
 
 const val = (f) => { const e = $("f-" + f.k); return f.t === "check" ? e.checked : f.t === "number" ? Number(e.value || 0) : e.value.trim(); };
@@ -143,19 +143,6 @@ async function homework(box) {
   };
   $("close").onclick = () => { $("a").checked = false; put({ active: false }, "الواجب اتقفل"); };
   $("clear").onclick = () => { $("u").value = ""; $("a").checked = false; put({ url: "", active: false }, "الرابط اتمسح"); };
-}
-
-async function contact(box) {
-  box.innerHTML = `<div class="panel"><h2>رسائل التواصل</h2><div id="items"></div></div>`;
-  async function load() {
-    const snaps = (await getDocs(query(collection(db, "contact"), orderBy("createdAt", "desc"), limit(100)))).docs;
-    if (!snaps.length) { $("items").innerHTML = `<p class="empty">لسه مفيش رسائل.</p>`; return; }
-    $("items").innerHTML = snaps.map((d) => {
-      const r = d.data();
-      return `<div class="item" style="text-align:right"><div><strong>${esc(r.name || "زيّار")}</strong><div class="meta">${esc(fmtDate(r.createdAt))}</div></div><p style="margin:.4rem 0;line-height:1.8">${esc(r.body)}</p></div>`;
-    }).join("");
-  }
-  await load();
 }
 
 async function students(box) {
