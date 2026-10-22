@@ -56,13 +56,13 @@ const SECTIONS = {
     { k: "pdfUrl", l: "رابط PDF (Google Drive)", t: "url", hint: "ارفع الملف على Drive > Share > Anyone with the link > انسخ الرابط." },
     { k: "order", l: "الترتيب (رقم)", t: "number" }] }
 };
-const TABS = [...Object.keys(SECTIONS).slice(0, 2), "homework", "courses", "lectures", "students"];
-const LABELS = { homework: "الواجب", students: "الدارسين", ...Object.fromEntries(Object.entries(SECTIONS).map(([k, v]) => [k, v.label])) };
+const TABS = [...Object.keys(SECTIONS).slice(0, 2), "homework", "courses", "lectures", "students", "contact"];
+const LABELS = { homework: "الواجب", students: "الدارسين", contact: "الرسائل", ...Object.fromEntries(Object.entries(SECTIONS).map(([k, v]) => [k, v.label])) };
 
 function open(t) {
   document.querySelectorAll("#tabs button").forEach((b) => b.setAttribute("aria-selected", b.dataset.t === t));
   panel.innerHTML = "";
-  (t === "homework" ? homework : t === "students" ? students : (box) => crud(box, t))(panel);
+  (t === "homework" ? homework : t === "students" ? students : t === "contact" ? contact : (box) => crud(box, t))(panel);
 }
 
 const val = (f) => { const e = $("f-" + f.k); return f.t === "check" ? e.checked : f.t === "number" ? Number(e.value || 0) : e.value.trim(); };
@@ -145,26 +145,56 @@ async function homework(box) {
   $("clear").onclick = () => { $("u").value = ""; $("a").checked = false; put({ url: "", active: false }, "الرابط اتمسح"); };
 }
 
+async function contact(box) {
+  box.innerHTML = `<div class="panel"><h2>رسائل التواصل</h2><div id="items"></div></div>`;
+  async function load() {
+    const snaps = (await getDocs(query(collection(db, "contact"), orderBy("createdAt", "desc"), limit(100)))).docs;
+    if (!snaps.length) { $("items").innerHTML = `<p class="empty">لسه مفيش رسائل.</p>`; return; }
+    $("items").innerHTML = snaps.map((d) => {
+      const r = d.data();
+      return `<div class="item" style="text-align:right"><div><strong>${esc(r.name || "زيّار")} <span class="pill">${esc(r.email || "")}</span></strong><div class="meta">${esc(fmtDate(r.createdAt))}</div></div><p style="margin:.4rem 0;line-height:1.8">${esc(r.body)}</p></div>`;
+    }).join("");
+  }
+  await load();
+}
+
 async function students(box) {
   box.innerHTML = `<div class="panel"><h2>إضافة دارس</h2><div class="grid2"><div><label for="n">الاسم</label><input id="n"></div><div><label for="un">اسم المستخدم (إنجليزي بدون مسافات)</label><input id="un" dir="ltr" autocapitalize="none"></div><div><label for="pw">كلمة المرور (6 حروف على الأقل)</label><input id="pw" dir="ltr"></div><div><label for="rl">الصلاحية</label><select id="rl"><option value="student">دارس</option><option value="admin">إدارة</option></select></div></div>
     <p><button class="btn" id="add">إضافة</button> <button class="btn alt" id="gen">توليد كلمة مرور</button></p><pre id="cred" dir="ltr" style="white-space:pre-wrap"></pre></div>
     <div class="panel"><h2>الدارسين</h2><div id="items"></div></div>`;
+
+  // Info panel explaining the sync
+  const info = document.createElement("div");
+  info.className = "panel";
+  info.innerHTML = `<h3>⚠️ ملاحظة هامة: التزامن مع Firebase Auth</h3>
+  <p>العمليات هنا بتأثر على <strong>Firestore بس</strong> (البروفايل، الدور، الحالة).</p>
+  <p>للعمليات دي لازم <strong>Firebase Admin SDK</strong> (Node.js في السكريبتات):</p>
+  <ul>
+    <li>🔐 <strong>تغيير الباسوورد</strong> → <code>node scripts/reset-password.mjs email@domain.com "NewPass123"</code></li>
+    <li>🗑️ <strong>حذف من Auth</strong> → <code>node scripts/delete-user.mjs email@domain.com</code></li>
+    <li>🚫 <strong>إيقاف/تفعيل في Auth</strong> → <code>node scripts/toggle-user.mjs email@domain.com disable|enable</code></li>
+    <li>📋 <strong>عرض كل اليوزرز</strong> → <code>node scripts/export-users-local.mjs</code></li>
+  </ul>
+  <p>السكريبتات دي في فولدر <code>scripts/</code> وتشغل محلياً على جهازك.</p>`;
+  box.prepend(info);
+
   const gen = () => { const c = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789"; return Array.from(crypto.getRandomValues(new Uint8Array(10)), (b) => c[b % c.length]).join(""); };
   $("gen").onclick = () => ($("pw").value = gen());
   async function load() {
     const rows = (await getDocs(collection(db, "users"))).docs.map((d) => ({ id: d.id, ...d.data() }));
-    $("items").innerHTML = rows.map((r) => { const me = r.id === auth.currentUser.uid; return `<div class="item"><div><strong>${esc(r.name)}</strong> <span class="pill">${r.role === "admin" ? "إدارة" : "دارس"}</span> ${r.active ? "" : '<span class="pill off">موقوف</span>'}<div class="meta" dir="ltr">${esc(r.username)}</div></div><div class="acts">${me ? '<span class="meta">حسابك</span>' : `<button class="btn small alt" data-a="${esc(r.id)}" data-v="${r.active ? 0 : 1}">${r.active ? "إيقاف" : "تفعيل"}</button><button class="btn small alt" data-r="${esc(r.id)}" data-v="${r.role === "admin" ? "student" : "admin"}">${r.role === "admin" ? "خليه دارس" : "خليه إدارة"}</button><button class="btn small danger" data-x="${esc(r.id)}">حذف الوصول</button>`}</div></div>`; }).join("");
+    $("items").innerHTML = rows.map((r) => { const me = r.id === auth.currentUser.uid; return `<div class="item"><div><strong>${esc(r.name)}</strong> <span class="pill">${r.role === "admin" ? "إدارة" : "دارس"}</span> ${r.active ? "" : '<span class="pill off">موقوف</span>'}<div class="meta" dir="ltr">${esc(r.username)}</div></div><div class="acts">${me ? '<span class="meta">حسابك</span>' : `<button class="btn small alt" data-a="${esc(r.id)}" data-v="${r.active ? 0 : 1}">${r.active ? "إيقاف" : "تفعيل"}</button><button class="btn small alt" data-r="${esc(r.id)}" data-v="${r.role === "admin" ? "student" : "admin"}">${r.role === "admin" ? "خليه دارس" : "خليه إدارة"}</button><button class="btn small danger" data-x="${esc(r.id)}">حذف من Firestore</button>`}</div></div>`; }).join("");
   }
   $("items").onclick = async (e) => {
     const t = e.target.dataset;
     try {
       if (t.a) await csrfProtectedWrite(updateDoc, doc(db, "users", t.a), { active: t.v === "1" });
       else if (t.r) await csrfProtectedWrite(updateDoc, doc(db, "users", t.r), { role: t.v });
-      else if (t.x && confirm("هيتشال وصول الدارس ده للموقع. متأكد؟")) await csrfProtectedWrite(deleteDoc, doc(db, "users", t.x));
+      else if (t.x && confirm("هيتشال وصول الدارس ده من Firestore. للحذف من Auth استعمل CLI. متأكد؟")) await csrfProtectedWrite(deleteDoc, doc(db, "users", t.x));
       else return;
       await load();
     } catch { toast("فشلت العملية", true); }
   };
+
   $("add").onclick = async () => {
     const name = $("n").value.trim(), un = $("un").value.trim().toLowerCase(), pw = $("pw").value, role = $("rl").value;
     if (!name || !/^[a-z0-9._-]{3,30}$/.test(un) || pw.length < 6) return toast("راجع الاسم واسم المستخدم (حروف إنجليزي/أرقام) وكلمة المرور (6+)", true);

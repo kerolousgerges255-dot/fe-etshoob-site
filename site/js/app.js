@@ -91,12 +91,13 @@ export function renderChrome(active, s) {
   if (s.user && L.telegram) {
     telegramLink = `<a href="${esc(safeUrl(L.telegram))}" target="_blank" rel="noopener noreferrer" aria-label="telegram" style="color:var(--gold);text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;margin-block-start:.8rem"><svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;flex:none">${ICONS.telegram}</svg>جروب التليجرام للدارسين</a>`;
   }
+  const contactEmail = SITE.contactEmail || "";
   document.getElementById("site-footer").innerHTML = `
     <div class="fband" aria-hidden="true"></div>
     <div class="wrap fgrid">
       <div><span class="plate"><img src="images/logo.png" alt=""></span><p>${esc(SITE.tagline || SITE.heroLead)}</p>${social.length ? `<div class="social">${social.join("")}</div>` : ""}${telegramLink}</div>
-      <div><h4>روابط سريعة</h4><ul>${links.map(([, h, l]) => `<li><a href="${h}">${l}</a></li>`).join("")}</ul></div>
-      <div><h4>المعهد</h4><span class="plate"><img src="images/cathedral.png" alt=""></span><p>${esc(SITE.institute)}</p>${SITE.instituteInfo ? `<p style="white-space:pre-line">${esc(SITE.instituteInfo)}</p>` : ""}${L.address ? `<p>${esc(L.address)}</p>` : ""}</div>
+      <div><h4>روابط سريعة</h4><ul>${links.map(([, h, l]) => `<li><a href="${h}">${l}</a></li>`).join("")}${contactEmail ? `<li><a href="javascript:void(0)" id="open-contact" style="color:var(--gold)">📩 تواصل معنا</a></li>` : ""}</ul></div>
+      <div><h4>المعهد</h4><span class="plate"><img src="images/cathedral.png" alt=""></span><p>${esc(SITE.institute)}</p>${SITE.instituteInfo ? `<p style="white-space:pre-line">${esc(SITE.instituteInfo)}</p>` : ""}${L.address ? `<p>${esc(L.address)}</p>` : ""}${contactEmail ? `<p style="margin-block-start:.6rem"><a href="mailto:${esc(contactEmail)}" style="color:var(--gold)">📧 ${esc(contactEmail)}</a></p>` : ""}</div>
     </div>
     <div class="copy">© ${new Date().getFullYear()} ${esc(SITE.name)} — معهد الكتاب المقدس</div>`;
   document.getElementById("logout")?.addEventListener("click", async () => { await signOut(auth); location.href = "index.html"; });
@@ -113,6 +114,42 @@ export function renderChrome(active, s) {
     document.body.appendChild(d);
     d.addEventListener("click", (e) => { if (e.target === d || e.target.hasAttribute("data-close")) d.close(); });
     bindLogin(d, () => location.reload());
+  }
+  // contact dialog
+  if (SITE.contactEmail) {
+    const cd = document.createElement("dialog");
+    cd.id = "contact-dlg"; cd.className = "dlg";
+    cd.innerHTML = `<div class="dlg-in dlg-in-contact">
+      <button class="x" aria-label="إغلاق" data-close>×</button>
+      <h2>تواصل معنا</h2>
+      <p class="meta">اكتب رسالتك أو مشكلتك وإحنا هنرد عليك في أقرب وقت.</p>
+      <div data-cmsg role="alert"></div>
+      <label for="cn">الاسم</label>
+      <input id="cn" autocomplete="name" placeholder="اسمك (اختياري)">
+      <label for="cm">الإيميل</label>
+      <input id="cm" type="email" autocomplete="email" dir="ltr" placeholder="example@email.com">
+      <label for="cb">الرسالة</label>
+      <textarea id="cb" placeholder="اكتب رسالتك هنا..."></textarea>
+      <button class="btn block" data-csend>إرسال</button>
+      <p class="meta" style="margin-block-start:.5rem">أو اكتبنا على <a href="mailto:${esc(SITE.contactEmail)}" style="color:var(--gold)">${esc(SITE.contactEmail)}</a></p>
+    </div>`;
+    document.body.appendChild(cd);
+    cd.addEventListener("click", (e) => { if (e.target === cd) cd.close(); });
+    const csend = cd.querySelector("[data-csend]"), cmsg = cd.querySelector("[data-cmsg]");
+    csend.onclick = async () => {
+      const name = cd.querySelector("#cn").value.trim(), email = cd.querySelector("#cm").value.trim(), body = cd.querySelector("#cb").value.trim();
+      if (!body) { cmsg.innerHTML = `<p class="notice bad">اكتب رسالتك الأول.</p>`; return; }
+      csend.disabled = true;
+      try {
+        await addDoc(collection(db, "contact"), { name, email, body, createdAt: serverTimestamp() });
+        cmsg.innerHTML = `<p class="notice">تم إرسال رسالتك، هنتواصل معاك في أقرب وقت. شكراً ليك!</p>`;
+        cd.querySelector("#cn").value = ""; cd.querySelector("#cm").value = ""; cd.querySelector("#cb").value = "";
+      } catch { cmsg.innerHTML = `<p class="notice bad">حصلت مشكلة. جرب تاني أو اكتبنا على الإيميل مباشرة.</p>`; }
+      finally { csend.disabled = false; }
+    };
+    document.addEventListener("click", (e) => {
+      if (e.target.closest("#open-contact")) cd.showModal();
+    });
   }
   document.addEventListener("click", (e) => {
     if (!e.target.closest("[data-login]")) return;

@@ -147,6 +147,9 @@ textarea{min-height:140px;resize:vertical}label{display:block;font-weight:700;ma
 /* dialogs */
 dialog{border:0;padding:0;color:var(--ink);background:#fff;border-radius:20px;box-shadow:0 30px 80px rgba(0,0,0,.4)}dialog::backdrop{background:rgba(47,11,8,.6);backdrop-filter:blur(3px)}
 .dlg{width:min(420px,92vw)}.dlg-in{padding:1.8rem 1.8rem 2rem;text-align:center;position:relative}.dlg-in img{height:78px;width:auto}.dlg h2{font-size:1.6rem;margin-block-start:.3rem}.dlg label{text-align:start}
+.dlg-in-contact label{margin-block-start:.8rem}
+.dlg-in-contact input,.dlg-in-contact textarea{margin-block-start:.3rem}
+.dlg-in-contact .btn{margin-block-start:1rem}
 .x{position:absolute;inset-block-start:.7rem;inset-inline-start:.9rem;border:0;background:none;font-size:1.9rem;line-height:1;cursor:pointer;color:var(--muted)}
 .reader{width:min(780px,96vw);max-height:92vh}.reader-in{padding:1.6rem clamp(1.2rem,4vw,2.6rem) 2.4rem;overflow:auto;max-height:92vh;position:relative}
 .reader h2{font-size:clamp(1.6rem,3.6vw,2.1rem);margin-block-start:1.6rem}.rtools{display:flex;gap:.4rem;margin-block-start:.8rem}
