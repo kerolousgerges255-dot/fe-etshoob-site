@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, collection, getDocs, query, orderBy, limit, serverTimestamp, increment, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import { firebaseConfig, SITE } from "./config.js";
 import { protect } from "./shield.js";
@@ -9,7 +9,7 @@ export const configured = !firebaseConfig.apiKey.startsWith("PASTE");
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-export { doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, collection, getDocs, query, orderBy, limit, serverTimestamp, increment, onSnapshot, signOut, SITE, firebaseConfig };
+export { doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, collection, getDocs, query, orderBy, limit, serverTimestamp, increment, onSnapshot, signOut, SITE, firebaseConfig, signInAnonymously };
 
 export { toEmail, esc, fmtDate, excerpt, renderText, safeUrl, viewUrl, downloadUrl };
 
@@ -133,11 +133,17 @@ export function renderChrome(active, s) {
     cd.addEventListener("click", (e) => { if (e.target === cd || e.target.hasAttribute("data-close")) cd.close(); });
     cd.addEventListener("keydown", (e) => { if (e.key === "Escape") cd.close(); });
     const csend = cd.querySelector("[data-csend]"), cmsg = cd.querySelector("[data-cmsg]");
+    let anonSignedIn = false;
     csend.onclick = async () => {
       const name = cd.querySelector("#cn").value.trim(), body = cd.querySelector("#cb").value.trim();
       if (!body) { cmsg.innerHTML = `<p class="notice bad">اكتب رسالتك الأول.</p>`; return; }
       csend.disabled = true;
       try {
+        // Sign in anonymously if not already done (needed for Firestore write even with public rules)
+        if (!anonSignedIn) {
+          await signInAnonymously(auth);
+          anonSignedIn = true;
+        }
         await addDoc(collection(db, "contact"), { name, body, createdAt: serverTimestamp() });
         cmsg.innerHTML = `<p class="notice">تم إرسال رسالتك، هنتواصل معاك في أقرب وقت. شكراً ليك!</p>`;
         cd.querySelector("#cn").value = ""; cd.querySelector("#cb").value = "";
