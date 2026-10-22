@@ -134,6 +134,7 @@ export function renderChrome(active, s) {
     cd.addEventListener("keydown", (e) => { if (e.key === "Escape") cd.close(); });
     const csend = cd.querySelector("[data-csend]"), cmsg = cd.querySelector("[data-cmsg]");
     let anonSignedIn = false;
+    let emailSent = false;
     csend.onclick = async () => {
       const name = cd.querySelector("#cn").value.trim(), body = cd.querySelector("#cb").value.trim();
       if (!body) { cmsg.innerHTML = `<p class="notice bad">اكتب رسالتك الأول.</p>`; return; }
@@ -144,7 +145,21 @@ export function renderChrome(active, s) {
           await signInAnonymously(auth);
           anonSignedIn = true;
         }
-        await addDoc(collection(db, "contact"), { name, body, createdAt: serverTimestamp() });
+        // Save to Firestore
+        const docRef = await addDoc(collection(db, "contact"), { name, body, createdAt: serverTimestamp() });
+        // Send email notification using EmailJS
+        if (typeof emailjs !== 'undefined') {
+          try {
+            await emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+              from_name: name || 'زيّار',
+              message: body,
+              to_email: 'fietshop10@gmail.com'
+            });
+            emailSent = true;
+          } catch (e) {
+            console.log('Email send failed (optional):', e);
+          }
+        }
         cmsg.innerHTML = `<p class="notice">تم إرسال رسالتك، هنتواصل معاك في أقرب وقت. شكراً ليك!</p>`;
         cd.querySelector("#cn").value = ""; cd.querySelector("#cb").value = "";
       } catch { cmsg.innerHTML = `<p class="notice bad">حصلت مشكلة. جرب تاني أو اكتبنا على الإيميل مباشرة.</p>`; }
