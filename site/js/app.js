@@ -126,23 +126,22 @@ export function renderChrome(active, s) {
       <div data-cmsg role="alert"></div>
       <label for="cn">الاسم</label>
       <input id="cn" autocomplete="name" placeholder="اسمك (اختياري)">
-      <label for="cm">الإيميل</label>
-      <input id="cm" type="email" autocomplete="email" dir="ltr" placeholder="example@email.com">
       <label for="cb">الرسالة</label>
       <textarea id="cb" placeholder="اكتب رسالتك هنا..."></textarea>
       <button class="btn block" data-csend>إرسال</button>
     </div>`;
     document.body.appendChild(cd);
-    cd.addEventListener("click", (e) => { if (e.target === cd) cd.close(); });
+    cd.addEventListener("click", (e) => { if (e.target === cd || e.target.hasAttribute("data-close")) cd.close(); });
+    cd.addEventListener("keydown", (e) => { if (e.key === "Escape") cd.close(); });
     const csend = cd.querySelector("[data-csend]"), cmsg = cd.querySelector("[data-cmsg]");
     csend.onclick = async () => {
-      const name = cd.querySelector("#cn").value.trim(), email = cd.querySelector("#cm").value.trim(), body = cd.querySelector("#cb").value.trim();
+      const name = cd.querySelector("#cn").value.trim(), body = cd.querySelector("#cb").value.trim();
       if (!body) { cmsg.innerHTML = `<p class="notice bad">اكتب رسالتك الأول.</p>`; return; }
       csend.disabled = true;
       try {
-        await addDoc(collection(db, "contact"), { name, email, body, createdAt: serverTimestamp() });
+        await addDoc(collection(db, "contact"), { name, body, createdAt: serverTimestamp() });
         cmsg.innerHTML = `<p class="notice">تم إرسال رسالتك، هنتواصل معاك في أقرب وقت. شكراً ليك!</p>`;
-        cd.querySelector("#cn").value = ""; cd.querySelector("#cm").value = ""; cd.querySelector("#cb").value = "";
+        cd.querySelector("#cn").value = ""; cd.querySelector("#cb").value = "";
       } catch { cmsg.innerHTML = `<p class="notice bad">حصلت مشكلة. جرب تاني أو اكتبنا على الإيميل مباشرة.</p>`; }
       finally { csend.disabled = false; }
     };

@@ -152,7 +152,7 @@ async function contact(box) {
     if (!snaps.length) { $("items").innerHTML = `<p class="empty">لسه مفيش رسائل.</p>`; return; }
     $("items").innerHTML = snaps.map((d) => {
       const r = d.data();
-      return `<div class="item" style="text-align:right"><div><strong>${esc(r.name || "زيّار")} <span class="pill">${esc(r.email || "")}</span></strong><div class="meta">${esc(fmtDate(r.createdAt))}</div></div><p style="margin:.4rem 0;line-height:1.8">${esc(r.body)}</p></div>`;
+      return `<div class="item" style="text-align:right"><div><strong>${esc(r.name || "زيّار")}</strong><div class="meta">${esc(fmtDate(r.createdAt))}</div></div><p style="margin:.4rem 0;line-height:1.8">${esc(r.body)}</p></div>`;
     }).join("");
   }
   await load();
