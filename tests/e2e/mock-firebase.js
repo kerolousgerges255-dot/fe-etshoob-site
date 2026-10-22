@@ -4,6 +4,7 @@ const ts = (d) => ({ toDate: () => new Date(d) });
 const P = new URLSearchParams(location.search);
 const store = {
   "users/u1": { name: "كيرلس جرجس", username: "kero.g", role: P.get("role") || "student", active: true },
+  contact: [],
   announcements: [
     { id: "a1", title: "بدء محاضرات الترم الأول", body: "المحاضرات كل يوم أحد الساعة السابعة مساءً.", pinned: true, createdAt: ts("2026-10-10") },
     { id: "a2", title: "تسجيل الكورس الثاني مفتوح", body: "يمكنك الآن تسجيل الكورس الثاني عبر لوحة الإدارة.", pinned: false, createdAt: ts("2026-10-15") }
@@ -24,7 +25,7 @@ const store = {
 };
 export const initializeApp = () => ({}); export const deleteApp = () => {};
 export const getAuth = () => ({ currentUser: P.get("guest") ? null : { uid: "u1" } });
-export const onAuthStateChanged = (auth, cb) => { cb(P.get("guest") ? null : { uid: "u1" }); return () => {}; };
+export const onAuthStateChanged = (auth, cb) => { Promise.resolve().then(() => cb(P.get("guest") ? null : { uid: "u1" })); return () => {}; };
 export const signInWithEmailAndPassword = async () => ({ user: { uid: "u1" } });
 export const createUserWithEmailAndPassword = async () => ({ user: { uid: "new" } });
 export const signOut = async () => {};
@@ -37,5 +38,7 @@ export const getDoc = async (r) => {
   return { exists: () => !!v, data: () => v, id: r.id };
 };
 export const getDocs = async (c) => ({ docs: (store[c.name] || []).map((x) => ({ id: x.id, data: () => x })), size: (store[c.name] || []).length });
-export const setDoc = async () => {}; export const addDoc = async () => ({}); export const updateDoc = async () => {}; export const deleteDoc = async () => {};
+let _docId = 100;
+export const addDoc = async (c, d) => { const id = `c${++_docId}`; store[c.name] = store[c.name] || []; store[c.name].push({ id, ...d }); return { id }; };
+export const setDoc = async () => {}; export const updateDoc = async () => {}; export const deleteDoc = async () => {};
 export const serverTimestamp = () => 0; export const increment = (n) => n; export const onSnapshot = () => () => {};

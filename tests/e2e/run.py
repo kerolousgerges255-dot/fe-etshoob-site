@@ -57,6 +57,26 @@ try:
         ok("أدوات المطوّر اتكشفت: الغطا ظهر والمحتوى اتمسح من الـ DOM", x.evaluate("!document.querySelector('.shield-cover').hidden") and x.evaluate("document.querySelector('main').children.length") == 0)
         x.close()
 
+        # ---- تواصل معنا
+        x = page(); x.goto(B + "index.html?guest=1"); x.wait_for_timeout(1500)
+        ok("زائر: زر تواصل معنا موجود في الفوتر", x.locator("#open-contact").count() == 1)
+        x.click("#open-contact"); x.wait_for_timeout(400)
+        ok("زائر: نافذة تواصل معنا اتفتحت", x.locator("#contact-dlg[open]").count() == 1)
+        x.evaluate("document.querySelector('#contact-dlg').close()"); x.wait_for_timeout(300)
+        ok("زائر: النافذة اتقفلت بالزرار", x.locator("#contact-dlg[open]").count() == 0)
+        x.screenshot(path=f"{OUT}/contact-guest.png"); x.close()
+
+        x = page(); x.goto(B + "index.html"); x.wait_for_timeout(1500)
+        ok("دارس: زر تواصل معنا موجود", x.locator("#open-contact").count() == 1)
+        x.click("#open-contact"); x.wait_for_timeout(400)
+        ok("دارس: النافذة اتفتحت", x.locator("#contact-dlg[open]").count() == 1)
+        x.click("[data-csend]"); x.wait_for_timeout(400)
+        ok("دارس: بدون رسالة — يظهر تنبيه خطأ", x.locator("[data-cmsg] .notice.bad").count() == 1)
+        x.fill("#cn", "متحدث منا"); x.fill("#cb", "عايز أسجل في الكورس الثاني، هل لسه التسجيل مفتوح؟")
+        x.click("[data-csend]"); x.wait_for_timeout(600)
+        ok("دارس: بعد الإرسال — رسالة نجاح + الحقول اتنظفت", x.locator("[data-cmsg] .notice:not(.bad)").count() == 1 and x.evaluate("document.querySelector('#cn').value === ''") and x.evaluate("document.querySelector('#cb').value === ''"))
+        x.evaluate("document.querySelector('#contact-dlg').close()"); x.screenshot(path=f"{OUT}/contact-student.png"); x.close()
+
         # ---- روابط خطرة من قاعدة البيانات (XSS)
         x = page(); x.goto(B + "index.html?hwjs=1&badcover=1"); x.wait_for_timeout(1500)
         ok("رابط الواجب javascript: بيتتجاهل (الواجب يظهر مقفول)", x.locator("a[href^='javascript']").count() == 0 and "مقفول" in x.inner_text(".hw-band"))
@@ -71,7 +91,7 @@ try:
         ok("نافذة قراءة التأمل بتفتح من الرابط", x.locator("dialog.reader[open]").count() == 1 and "كلمتك سراج" in x.inner_text("#rb"))
         x.screenshot(path=f"{OUT}/reader.png"); ok("التأملات: مفيش أخطاء JS", not x.errs, x.errs); x.close()
 
-        # ---- لوحة الإدارة (اتكسرت قبل كده بسبب ترتيب التعريفات)
+        # ---- لوحة الإدارة
         x = page(); x.goto(B + "admin.html?role=admin"); x.wait_for_timeout(1500)
         ok("الإدارة: التبويبات والنموذج بيظهروا", x.locator("#tabs button").count() == 6 and x.locator("#panel .panel").count() >= 1)
         x.fill("#f-title", "اختبار"); x.click("#save"); x.wait_for_timeout(300)

@@ -91,12 +91,11 @@ export function renderChrome(active, s) {
   if (s.user && L.telegram) {
     telegramLink = `<a href="${esc(safeUrl(L.telegram))}" target="_blank" rel="noopener noreferrer" aria-label="telegram" style="color:var(--gold);text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;margin-block-start:.8rem"><svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;flex:none">${ICONS.telegram}</svg>جروب التليجرام للدارسين</a>`;
   }
-  const contactEmail = SITE.contactEmail || "";
   document.getElementById("site-footer").innerHTML = `
     <div class="fband" aria-hidden="true"></div>
     <div class="wrap fgrid">
       <div><span class="plate"><img src="images/logo.png" alt=""></span><p>${esc(SITE.tagline || SITE.heroLead)}</p>${social.length ? `<div class="social">${social.join("")}</div>` : ""}${telegramLink}</div>
-      <div><h4>روابط سريعة</h4><ul>${links.map(([, h, l]) => `<li><a href="${h}">${l}</a></li>`).join("")}${contactEmail ? `<li><a href="javascript:void(0)" id="open-contact" style="color:var(--gold)">📩 تواصل معنا</a></li>` : ""}</ul></div>
+      <div><h4>روابط سريعة</h4><ul>${links.map(([, h, l]) => `<li><a href="${h}">${l}</a></li>`).join("")}<li><a href="javascript:void(0)" id="open-contact" style="color:var(--gold)">📩 تواصل معنا</a></li></ul></div>
       <div><h4>المعهد</h4><span class="plate"><img src="images/cathedral.png" alt=""></span><p>${esc(SITE.institute)}</p>${SITE.instituteInfo ? `<p style="white-space:pre-line">${esc(SITE.instituteInfo)}</p>` : ""}${L.address ? `<p>${esc(L.address)}</p>` : ""}</div>
     </div>
     <div class="copy">© ${new Date().getFullYear()} ${esc(SITE.name)} — معهد الكتاب المقدس</div>`;
@@ -115,8 +114,8 @@ export function renderChrome(active, s) {
     d.addEventListener("click", (e) => { if (e.target === d || e.target.hasAttribute("data-close")) d.close(); });
     bindLogin(d, () => location.reload());
   }
-  // contact dialog
-  if (SITE.contactEmail) {
+  // contact dialog — ظاهر للزوار والدارسين على حد سواء
+  {
     const cd = document.createElement("dialog");
     cd.id = "contact-dlg"; cd.className = "dlg";
     cd.innerHTML = `<div class="dlg-in dlg-in-contact">

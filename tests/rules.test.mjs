@@ -8,12 +8,14 @@ const code = raw.split("\n").map((l) => l.replace(/\/\/.*$/, "")).join("\n");   
 test("قواعد Firestore: أي حاجة مش مذكورة مقفولة", () => {
   assert.match(code, /match \/\{document=\*\*\}\s*\{\s*allow read, write:\s*if false;/);
 });
-test("قواعد Firestore: مفيش قراءة مفتوحة للكل (ماعدا courses و meditations)", () => {
+test("قواعد Firestore: مفيش قراءة مفتوحة للكل (ماعدا courses و meditations و contact)", () => {
   // courses و meditations allow read: if true مقصود (Tasks 4, 5)
+  // contact allow write: if true مقصود عشان الزوار يبعتوا رسائل من غير دخول
   const rulesExceptPublic = code
     .replace(/match \/courses\/\{id\}\s*\{[^}]*allow read:\s*if true;[^}]*\}/, "")
-    .replace(/match \/meditations\/\{id\}\s*\{[^}]*allow read:\s*if true;[^}]*\}/, "");
-  assert.ok(!/if true/.test(rulesExceptPublic), "فيه 'if true' في قاعدة غير courses/meditations");
+    .replace(/match \/meditations\/\{id\}\s*\{[^}]*allow read:\s*if true;[^}]*\}/, "")
+    .replace(/match \/contact\/\{id\}\s*\{[^}]*allow write:\s*if true;[^}]*\}/, "");
+  assert.ok(!/if true/.test(rulesExceptPublic), "فيه 'if true' في قاعدة غير courses/meditations/contact");
 });
 test("قواعد Firestore: كل المحتوى للدارسين المفعّلين، والكتابة للإدارة", () => {
   // meditations و courses: قراءة عامة (Tasks 4, 5)
